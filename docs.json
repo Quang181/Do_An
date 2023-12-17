@@ -1,0 +1,269 @@
+# ------------------------Product
+        # ------------------------------ Create_Product
+
+Dữ liệu front_end gửi cho back_end
+        # POST: "/shoe/products"-> Gửi dữ liệu từ BODY
+{
+        "id_category": "api trả về tên và id loại sản phẩm" -> "/categorys": GET
+    "name": "str",
+    "price": : "str",
+    "discount" "str",
+    "source": "str",
+    "image_1": "",
+    "image_2": "",
+    "image_3": "",
+    "image_4": "",
+}
+# Dữ liệu trả cho back_end nếu thêm thành công
+{
+   "id_category": ""
+    "name": "str",
+    "price": : "str",
+    "discount" "str",
+    "source": "str",
+    "image_1": "",
+    "image_2": "",
+    "image_3": "",
+    "image_4": ""
+}
+#--------------------------------------------------------
+
+#-------------------------- Xoa san pham ----------------
+
+Dữ liệu front_end trả back_end
+DELETE: "/shoe/product/<id_product>"
+# Dữ liệu back_end trả front_end khi xóa thành công
+{
+        "code": 200
+}
+#------------------------------------------------------------
+
+# -----------------------------------------------------------
+        # ------------------------------- UPDATE_PRODUCT----------------------------
+        # Dữ liệu front_end trả back_end
+        # PUT: "/product/<id_product>"
+{
+    "id_category": ""
+    "name": "str",
+    "price": : "str",
+    "discount" "str",
+    "source": "str",
+    "image_1": "",
+    "image_2": "",
+    "image_3": "",
+    "image_4": ""
+
+}
+# Dữ liệu backend trả front end nếu sửa thành công
+{
+    "id_category": ""
+    "name": "str",
+    "price": : "str",
+    "discount" "str",
+    "source": "str",
+    "image_1": "",
+    "image_2": "",
+    "image_3": "",
+    "image_4": ""
+}
+
+#---------------------------------------------------
+# --------------------- GET_list_product-------------------------
+        # GET: "/shoe/products" -> Lấy dữ liệu từ params
+        # Bộ lọc bao gồm : Lọc theo loại sản phẩm: VD: vans, nike ....
+                        : Thanh search: tìm kiếm theo tên sản phẩm
+                        : Lọc theo giá tiền fix cứng: Nhỏ hơn 500.000 vnd, Lớn hơn 500.000 vnd
+{
+        "category": "vans,nike.." cách nhau bởi dấu ",",
+        "search": "",
+        "money": ["min", "max"]: min: Nhỏ hơn 500.000 và ngược lại
+        "page": "",
+        "per_page": ""
+        => Dữ liệu trong PARAMS
+}
+# Dữ liệu backend trả về
+{
+    "data": [
+    {
+            "id_product": "",
+            "name": ""
+            "price":
+            "discount": "",
+            "category": "",
+            "soruce": "",
+            "image_1": "",
+            "image_2": "",
+            "image_3": "",
+            "image_4": "",
+    }, ....
+    ],
+     "paging": {
+        "page": 1,
+        "per_page": 15,
+        "total_count": 15 Tổng số product thỏa mãn điều kiện,
+        "total_page": 2
+    }
+
+}
+# ----------------------------------------------------------
+# -------------------- Tạo file excel => Tạo 1 button "Tạo file excel"
+# GET: "/shoe/excel/product"
+# FRONT_END trả về back_end như api get_list_product
+# Back_end trả về front_end: Có 2 trường hợp nhỏ hơn 10 sản phẩm thì sẽ nhận trực tiếp file excel
+                              Lớn hơn 10 thì thông báo file excel sẽ gửi về google_driver
+{
+        Nhỏ hơn 10:
+        "code": 1, Căn cứ vào mã code để in ra thông báo
+        "link_file": ""
+}
+{
+        Lớn hơn 10
+        "code": 2,
+        "link file" ""
+}
+#-------------------------------------------------------
+
+# -------------------------------------------- đăng nhập BODY:
+# POST: "/shoe/login" -> BODY
+{"username": "", "password": ""}
+
+# Dữ liệu khi đăng nhập thành công
+{
+    "data": {
+        "token": "",
+        "role_group": "admin, staff" -> trang admin, "client": -> "trang thông tin danh sách đơn hàng mua"
+    }
+}
+# PUT: "/shoe/change-password": -> BODY
+# -------------------------------------------------Đổi mật khẩu BODY:
+# Có 2 form đổi mật khẩu 1 là ngoài màn hình đăng nhập và 2 là bên trong sau khi đã đăng nhập
+{
+    # Ngoài màn hình đăng nhập
+    "username": "",
+    "password_old": "",
+    "password_new": "",
+    "password_verify": "",
+}
+
+{
+    # Bên trong sau khi đăng nhập
+    "password_old": "",
+    "password_new": "",
+    "password_verify": "",
+}
+
+# Dữ liệu trả lên front_end
+{
+    "data": {
+        "username": "",
+        "password": "",
+    }
+}
+
+
+#--------------------------- ACCOUNT --------------------------------------
+# -------------------------------------Create_account Lấy ở Body -> Dữ liệu front_end gửi về backend
+# Có 2 form tạo 1 cho admin và 1 cho client tự tạo Phương thức [ POST ]
+{
+    #CURL: "/shoe/accounts"  POST
+    # form cho admin tạo
+    "fullname":
+    "username": "",
+    "password": "",
+    "phone_number": "",
+    "email": "",
+    "role_group": # Có 3 role là Admin, staff, client fix cứng hoặc thêm api cũng đc
+}
+
+{
+    #CURL: "/shoe/account-client"  POST
+    # form cho client tạo
+    "fullname":
+    "username": "",
+    "password": "",
+    "phone_number": "",
+    "email": "",
+    # Không có role group mặc định backend sẽ hiểu là role client
+}
+
+# Data trả về front end
+{
+    "data": {
+              "code": 200
+            }
+}
+
+----------- DELETE ---------------------
+Dữ liệu front_end gửi
+
+{
+        # CURL: "/shoe/account/<account_id>"  DELETE
+    # backend sẽ kiểm tra nếu như người xóa có quyền amdin mới đc xóa
+}
+
+#Backend trả về front end
+{
+  "code": 200
+}
+------------------- UPDATE -------------------------
+# Có 2 form 1 là cập nhập tài khoản của chính mình, 2 là cập nhập tài khoản của các tài khoản khác chỉ admin được dùng back_end sẽ tự đi kiểm tra
+
+{
+    #Chức năng cập nhập dành cho admin
+    CURL: "/account/<account/id>" PUT
+    -----
+    "fullname": "",
+    "email": "",
+    "phone_number": "",
+    "role_group": có admin, staff, client front end fix cứng hoặc gọi api
+},
+{
+     #Chức năng cập nhập chính tài khoản của mình backend sẽ tự đi lấy dữ liệu account_id trong token để update
+    CURL: "/account" PUT
+    -----
+    "fullname": "",
+    "email": "",
+    "phone_number": ""
+}
+
+# Dữ liệu backend trả về khi cập nhập thành công
+{
+  "code": 200
+}
+
+------------------- GET_LIST_ACCOUNT ---------------------------
+# Chức năng danh sách bộ lọc sẽ bao gồm: Lọc theo role_group: [admin, staff, client]
+                                        Lọc theo account đang hoạt động hoặc không hoạt động
+        => 2 bộ lọc trên front_end fix cứng hoặc gọi api
+
+{
+        CURL: "/accounts" GET
+        # Dữ liệu fornt_end gửi cho back_end dùng PARAMS
+        "role_group": ""# Nếu không chọn 1 trong các role thì không gửi lên [admin, staff, client] là 1 chuỗi string mỗi trường cách nhau bởi dấu ",", VD: admin,staff,client
+        "status_account": "" # Như trên  [onl, off] là 1 chuỗi string mỗi trường cách nhau bởi dấu "," VD: onl,off,
+        "page": 1,
+        "per_page": 15
+}
+# Dữ liệu backend trả cho frontend
+{
+    "data": [
+        {
+                "id_account": ""
+                "fullname": "",
+                "email": "",
+                "phone_number": "",
+                "status": "Trạng thái đang onl hay off",
+                "username": "",
+                "role_group", "",
+        }
+    ],
+    "paging": {
+        "page": 1,
+        "per_page": 15,
+        "total_count": 15 Tổng số account thỏa mãn điều kiện,
+        "total_page": 2
+}
+}
+
+---------------------------------- Chức năng lưu dữ liệu vào file excel ----------------------
+Y như get list account đợi cập nhập sau

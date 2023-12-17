@@ -1,0 +1,5 @@
+peewee
+flask
+redis==5.0.0b1
+pyJWT~=2.6.0
+pymongo
