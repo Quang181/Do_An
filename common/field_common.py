@@ -31,6 +31,7 @@ class ACCOUNT:
     LIST_ROLE = "/roles"
     LIST_STATUS = "/status"
     DETAIL_ACCOUNT = "/account/<account_id>"
+    ACCOUNT_CLIENT = "/account/by_ids"
 
 
 class METHOD:

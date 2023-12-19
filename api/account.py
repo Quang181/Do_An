@@ -57,3 +57,13 @@ def get_list_account():
 @account.route(ACCOUNT.DETAIL_ACCOUNT, methods={METHOD.GET})
 def detail_account(account_id):
     return AccountController().detail_account(account_id)
+
+
+@account.route(ACCOUNT.ACCOUNT_CLIENT, methods={METHOD.POST})
+def create_account_client():
+    return AccountController().create_account_client()
+
+
+@account.route(ACCOUNT.ACCOUNT_CLIENT, methods={METHOD.POST})
+def get_info_account_by_ids():
+    return AccountController().get_info_account_by_ids()

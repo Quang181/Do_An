@@ -67,7 +67,7 @@ class AccountController(BaseController):
 
         for i in [AccountField.password, AccountField.fullname, AccountField.phone]:
             if body.get(i) and i == AccountField.password:
-                new_password = hmac.new(SECRET_KEY, body.get(i).encode('utf-8'), hashlib.sha256).hexdigest()
+                new_password = hmac.new(bytes(SECRET_KEY, "utf-8"), bytes(body.get(i), 'utf-8'), hashlib.sha256).hexdigest()
                 data_update.update({i: new_password})
             elif body.get(i) and i == AccountField.phone:
                 phone = self.chuan_hoa_so_dien_thoai(body.get(i))
@@ -403,4 +403,52 @@ class AccountController(BaseController):
             "code": 200,
             "data": detail_account
         }
-    
+
+    def create_account_client(self):
+        body = request.json
+        username = body.get(AccountField.username)
+        fullname = body.get(AccountField.fullname)
+        email = body.get(AccountField.email)
+        phone = body.get(AccountField.phone)
+        password = body.get(AccountField.password)
+        verify_password = body.get("verify_password")
+
+        for i in [AccountField.username, AccountField.fullname, AccountField.email, AccountField.phone,
+                  AccountField.password, "verify_password"]:
+            if not body.get(i):
+                return jsonify(self.get_error("{} Không được bỏ trống".format(i))), 413
+        if password != verify_password:
+            return jsonify(self.get_error("Mật khẩu và mật khẩu xác minh phải trùng nhau")), 413
+
+        account_info = AccountModel().filter_one({AccountField.username: username})
+        if account_info:
+            return jsonify(self.get_error("Username đã tồn tại")), 413
+
+        new_password = hmac.new(bytes(SECRET_KEY, "utf-8"), bytes(password, 'utf-8'), hashlib.sha256).hexdigest()
+        id_account = self.generate_uuid()
+        insert_account = AccountModel(id=id_account, username=username, email=email, fullname=fullname,
+                                      password=new_password, role=AccountField.Role.client, phone=phone).create_account(
+            self.this_moment_create())
+
+        if not insert_account:
+            return jsonify(self.get_error("Tạo tài khoản không thành công")), 413
+
+        account_insert = AccountModel().filter_one({AccountField.username: username}, {"_id": 0})
+
+        return {
+            "code": 200,
+            "data": account_insert
+        }
+
+    def get_info_account_by_ids(self):
+        body = request.json
+        ids = body.get("ids")
+
+        if not ids:
+            return jsonify(self.get_error("Ids không được để trống")), 413
+
+        list_account = AccountModel().find({AccountField.id: {"$in": ids}}, {"_id": 0})
+        return {
+            "code": 200,
+            "data": list_account
+        }
