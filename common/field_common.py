@@ -30,6 +30,7 @@ class ACCOUNT:
     CHANGE_PASSWORD = "/forget/change-password"
     LIST_ROLE = "/roles"
     LIST_STATUS = "/status"
+    DETAIL_ACCOUNT = "/account/<account_id>"
 
 
 class METHOD:

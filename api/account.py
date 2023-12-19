@@ -52,3 +52,8 @@ def get_status():
 @account.route(ACCOUNT.ACCOUNT, methods={METHOD.GET})
 def get_list_account():
     return AccountController().get_list_account()
+
+
+@account.route(ACCOUNT.DETAIL_ACCOUNT, methods={METHOD.GET})
+def detail_account(account_id):
+    return AccountController().detail_account(account_id)

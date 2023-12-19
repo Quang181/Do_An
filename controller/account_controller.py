@@ -86,7 +86,7 @@ class AccountController(BaseController):
 
     def delete_account(self):
         if self.get_info_in_token(AccountField.role) != "admin":
-            return jsonify(self.get_error("Bạn không có quyền sửa tài khoản"))
+            return jsonify(self.get_error("Bạn không có quyền xóa tài khoản"))
 
         body = request.json
 
@@ -390,3 +390,17 @@ class AccountController(BaseController):
             return []
 
         return {"$and": data_query}
+
+    def detail_account(self, account_id):
+        if not account_id:
+            return jsonify(self.get_error("Account id not null")), 413
+
+        detail_account = AccountModel().filter_one({AccountField.id: account_id}, {"_id": 0})
+        if not detail_account:
+            return jsonify(self.get_error("Account_id not exits")), 413
+
+        return {
+            "code": 200,
+            "data": detail_account
+        }
+    
