@@ -1,15 +1,13 @@
 import math
-import os
+
 import pymongo
 
 from common.field_common import PAGINATION
 
-MONGO_USERNAME = os.environ.get("MONGO_USERNAME")
-MONGO_PASSWORD = os.environ.get("MONGO_PASSWORD")
-MONGO_DB = os.environ.get("MONGO_DB")
+MONGO_URI = "mongodb+srv://lama:123456abcA@cluster0.zwewujx.mongodb.net/shoe_store?retryWrites=true&w=majority"
+MONGO_DB = "shoe_store"
 
-Mongo_Client = pymongo.MongoClient(
-    host="localhost", port=27017, username=MONGO_USERNAME, password=MONGO_PASSWORD)
+Mongo_Client = pymongo.MongoClient(MONGO_URI)
 
 CONFIG_ACCOUNT_DB = Mongo_Client[MONGO_DB]
 
