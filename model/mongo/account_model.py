@@ -11,6 +11,7 @@ class AccountField:
     password = "password"
     role = "role"
     phone = "phone"
+    update_on = "update_on"
 
     all_field = [fullname, email, username, password, role, phone]
 

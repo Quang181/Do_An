@@ -32,6 +32,20 @@ class ACCOUNT:
     LIST_STATUS = "/status"
     DETAIL_ACCOUNT = "/account/<account_id>"
     ACCOUNT_CLIENT = "/account/by_ids"
+    ACCOUNT_CHECK_IN = "/account/check-in"
+    GET_WAGE = "/account/get_wage"
+    ACCOUNT_NOT_TEAM = "/account/not-team"
+
+
+class CATEGORY:
+    CATEGORYS = "/category"
+    LIST_STATUS = "/category/status"
+
+
+class TEAM:
+    TEAM = "/team"
+    TEAM_UPDATE = "/team/<team_id>"
+    TEAM_ACCOUNT = "/team/account"
 
 
 class METHOD:

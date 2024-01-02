@@ -16,13 +16,19 @@ from model.mongo.lock_account import LockAccountModel
 from model.mongo.history_lock_account import HistoryLockAccountModel
 import random
 from tools.string_tools import StringTool
+from pymongo import DESCENDING
+from model.mongo.check_in import CheckIn
+from pymongo import InsertOne, UpdateOne
+import calendar
+from model.mongo.wage_account_model import WageAccountModel
+from model.mongo.team_assign import TeamAssignModel
 
 
 class AccountController(BaseController):
 
     def create_account(self):
-        if self.get_info_in_token(AccountField.role) != "admin":
-            return jsonify(self.get_error("Bạn không có quyền tạo tài khoản"))
+        # if self.get_info_in_token(AccountField.role) != "admin":
+        #     return jsonify(self.get_error("Bạn không có quyền tạo tài khoản"))
 
         body = request.json
         field_none = self.validate_input(AccountField.all_field, body)
@@ -67,7 +73,8 @@ class AccountController(BaseController):
 
         for i in [AccountField.password, AccountField.fullname, AccountField.phone]:
             if body.get(i) and i == AccountField.password:
-                new_password = hmac.new(bytes(SECRET_KEY, "utf-8"), bytes(body.get(i), 'utf-8'), hashlib.sha256).hexdigest()
+                new_password = hmac.new(bytes(SECRET_KEY, "utf-8"), bytes(body.get(i), 'utf-8'),
+                                        hashlib.sha256).hexdigest()
                 data_update.update({i: new_password})
             elif body.get(i) and i == AccountField.phone:
                 phone = self.chuan_hoa_so_dien_thoai(body.get(i))
@@ -85,17 +92,20 @@ class AccountController(BaseController):
         }
 
     def delete_account(self):
-        if self.get_info_in_token(AccountField.role) != "admin":
-            return jsonify(self.get_error("Bạn không có quyền xóa tài khoản"))
+        # if self.get_info_in_token(AccountField.role) != "admin":
+        #     return jsonify(self.get_error("Bạn không có quyền xóa tài khoản"))
 
         body = request.json
 
         ids_account = body.get("ids_account")
+
+        if not ids_account:
+            return jsonify(self.get_error("Không được phép để trống tài khoản muốn xóa"))
         if self.get_info_in_token(AccountField.id) in ids_account:
             return jsonify(self.get_error("Bạn không được phép xóa tài khoản của chính mình"))
 
         if ids_account:
-            check_exits = AccountModel().filter_one({AccountField.id: {"$in": ids_account}})
+            check_exits = AccountModel().find({AccountField.id: {"$in": ids_account}})
 
             if len(ids_account) != len(check_exits):
                 return jsonify(self.get_error({"Account không tồn tại"})), 413
@@ -277,16 +287,16 @@ class AccountController(BaseController):
         role_user = "admin"
         role_user = self.get_list_permision(role_user)
         query = self.create_query_account(param, role_user)
-        if not query:
-            return {
-                "data": [],
-                "paging": {
-                    "page": paging.get("page"),
-                    "per_page": paging.get("per_page")
-                }
-            }
+        # if not query:
+        #     return {
+        #         "data": [],
+        #         "paging": {
+        #             "page": paging.get("page"),
+        #             "per_page": paging.get("per_page")
+        #         }
+        #     }
 
-        list_data = AccountModel().get_list_entity(query, paging)
+        list_data = AccountModel().get_list_entity(query, paging, sort_options=[(AccountField.update_on, DESCENDING)])
         paging = self.get_info_paging_for_response(list_data, paging)
 
         data_response = []
@@ -386,10 +396,12 @@ class AccountController(BaseController):
             elif status == "off":
                 data_query.append({AccountField.id: {"$nin": account_onl}})
 
-        if not data_query:
-            return []
-
-        return {"$and": data_query}
+        # if not data_query:
+        #     return []
+        if data_query:
+            return {"$and": data_query}
+        else:
+            return {}
 
     def detail_account(self, account_id):
         if not account_id:
@@ -452,3 +464,110 @@ class AccountController(BaseController):
             "code": 200,
             "data": list_account
         }
+
+    def check_in_account(self):
+        body = request.json
+        if not body:
+            return jsonify(self.get_error("Body not null")), 413
+
+        for i in body:
+            if "account_id" not in i or "time_work" not in i:
+                return jsonify(self.get_error("Validate error")), 413
+
+        account_ids = [i.get("account_id") for i in body]
+        check_exits = AccountModel().find({AccountField.id: {"$in": account_ids}})
+        if len(account_ids) != len(check_exits):
+            return jsonify(self.get_error("Account not exits")), 413
+
+        time_first = self.set_time_to_first_time_in_day(datetime.datetime.now())
+        if CheckIn().filter_one({CheckIn.time: time_first}):
+            return jsonify(self.get_error("Đã check in ngày hôm nay")), 413
+
+        bulk_insert = []
+        for i in body:
+            account_id = i.get(CheckIn.account_id)
+            time_work = i.get(CheckIn.time_work)
+
+            data_insert = {
+                CheckIn.account_id: account_id,
+                CheckIn.time_work: time_work,
+                CheckIn.time: time_first,
+                **self.this_moment_create()
+            }
+            bulk_insert.append(InsertOne(data_insert))
+
+        if bulk_insert:
+            CheckIn().bulk_write(bulk_insert)
+
+        return {
+            "code": 200
+        }
+
+    def get_wage_account(self):
+        param = request.json
+        account_id = param.get("account_id")
+        time_now = datetime.datetime.now()
+        month = time_now.month
+        year = time_now.year
+        convert_time_first_str = "{}-{}-{}".format(year, month, "01")
+        time_first = datetime.datetime.strptime(convert_time_first_str, "%Y-%m-%d")
+        time_first = time_first.timestamp()
+
+        number_day = calendar.monthrange(year, month)[1]
+        get_wage_account = WageAccountModel().filter_one({WageAccountModel.account_id: account_id})
+        if not get_wage_account or not get_wage_account.get(WageAccountModel.wage):
+            return {
+                "code": 200,
+                "data": {
+                    "wage": 0,
+                    "time_month": month,
+                }
+            }
+        check_in = CheckIn().find({CheckIn.account_id: account_id,
+                                   "$gte": time_first,
+                                   "$lte": time_now.timestamp()})
+        wage_by_day = get_wage_account.get(WageAccountModel.wage) / number_day
+        total_wage = wage_by_day * len(check_in)
+
+        return {
+            "code": 200,
+            "data": {
+                "wage": total_wage,
+                "time_month": month
+            }
+        }
+
+    def account_not_in_team(self):
+        check_account = TeamAssignModel().find({})
+
+        account_ids = [i.get(TeamAssignModel.id_account) for i in check_account]
+        list_account = AccountModel().find({AccountField.id: {"$nin": account_ids}})
+
+        data_response = []
+        for i in list_account:
+            id_account = i.get(AccountField.id)
+            username = i.get(AccountField.username)
+            phone = i.get(AccountField.phone)
+            fullname = i.get(AccountField.fullname)
+            role = i.get(AccountField.role)
+            email = i.get(AccountField.email)
+
+            data_account = {
+                AccountField.id: id_account,
+                AccountField.username: username,
+                AccountField.phone: phone,
+                AccountField.fullname: fullname,
+                AccountField.role: role,
+                AccountField.email: email
+            }
+            data_response.append(data_account)
+
+        return {
+            "code": 200,
+            "data": data_response
+        }
+
+    @classmethod
+    def set_time_to_first_time_in_day(cls, time):
+        time_first = time.replace(hour=0, minute=0, second=0, microsecond=0)
+        return time_first.timestamp()

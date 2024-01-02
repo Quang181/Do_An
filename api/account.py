@@ -24,7 +24,7 @@ def update_account(account_id):
 
 
 @account.route(ACCOUNT.ACCOUNT, methods={METHOD.DELETE})
-@token_required
+# @token_required
 def delete_account():
     return AccountController().delete_account()
 
@@ -67,3 +67,18 @@ def create_account_client():
 @account.route(ACCOUNT.ACCOUNT_CLIENT, methods={METHOD.POST})
 def get_info_account_by_ids():
     return AccountController().get_info_account_by_ids()
+
+
+@account.route(ACCOUNT.ACCOUNT_CHECK_IN, methods={METHOD.POST})
+def check_in_account():
+    return AccountController().check_in_account()
+
+
+@account.route(ACCOUNT.GET_WAGE, methods={METHOD.GET})
+def get_wage_account():
+    return AccountController().get_wage_account()
+
+
+@account.route(ACCOUNT.ACCOUNT_NOT_TEAM, methods={METHOD.GET})
+def account_not_in_team():
+    return AccountController().account_not_in_team()
