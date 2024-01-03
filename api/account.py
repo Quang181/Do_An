@@ -91,3 +91,21 @@ def get_wage_account(account_id):
 @token_required
 def account_not_in_team():
     return AccountController().account_not_in_team()
+
+
+@account.route(ACCOUNT.CHECK_DAY_CHECK_In, methods={METHOD.GET})
+# @token_required
+def check_day_check_in():
+    return AccountController().check_day_check_in()
+
+
+@account.route(ACCOUNT.ACCOUNT_CHECK_IN_DAY, methods={METHOD.GET})
+# @token_required
+def list_account_check_in_by_day():
+    return AccountController().list_account_check_in_by_day()
+
+
+@account.route(ACCOUNT.ACCOUNT_NOT_CLIENT, methods={METHOD.GET})
+# @token_required
+def list_account_not_client():
+    return AccountController().list_account_not_client()

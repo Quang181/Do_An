@@ -35,6 +35,9 @@ class ACCOUNT:
     ACCOUNT_CHECK_IN = "/account/check-in"
     GET_WAGE = "/account/<account_id>/get_wage"
     ACCOUNT_NOT_TEAM = "/account/not-team"
+    CHECK_DAY_CHECK_In = "/day/status-check-in"
+    ACCOUNT_CHECK_IN_DAY = "/account/day/check-in"
+    ACCOUNT_NOT_CLIENT = "/account/not-client"
 
 
 class CATEGORY:

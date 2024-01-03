@@ -22,6 +22,8 @@ from pymongo import InsertOne, UpdateOne
 import calendar
 from model.mongo.wage_account_model import WageAccountModel
 from model.mongo.team_assign import TeamAssignModel
+from common.date import Date
+from model.mongo.calender_check_in import CalenderCheckIn
 
 
 class AccountController(BaseController):
@@ -467,24 +469,29 @@ class AccountController(BaseController):
 
     def check_in_account(self):
         body = request.json
+        time = body.get("time")
+        accounts = body.get("accounts")
         if not body:
             return jsonify(self.get_error("Body not null")), 413
 
-        for i in body:
+        if not time:
+            return jsonify(self.get_error("Time not null")), 413
+
+        for i in accounts:
             if "account_id" not in i or "time_work" not in i:
                 return jsonify(self.get_error("Validate error")), 413
 
-        account_ids = [i.get("account_id") for i in body]
+        account_ids = [i.get("account_id") for i in accounts]
         check_exits = AccountModel().find({AccountField.id: {"$in": account_ids}})
         if len(account_ids) != len(check_exits):
             return jsonify(self.get_error("Account not exits")), 413
 
-        time_first = self.set_time_to_first_time_in_day(datetime.datetime.now())
+        time_first = self.set_time_to_first_time_in_day(Date.convert_str_to_date(time, "%d/%m/%Y"))
         if CheckIn().filter_one({CheckIn.time: time_first}):
-            return jsonify(self.get_error("Đã check in ngày hôm nay")), 413
+            return jsonify(self.get_error("Đã check in ngày này ")), 413
 
         bulk_insert = []
-        for i in body:
+        for i in accounts:
             account_id = i.get(CheckIn.account_id)
             time_work = i.get(CheckIn.time_work)
 
@@ -498,6 +505,9 @@ class AccountController(BaseController):
 
         if bulk_insert:
             CheckIn().bulk_write(bulk_insert)
+
+        CalenderCheckIn().insert_one({CalenderCheckIn.time: time_first,
+                                      **self.this_moment_create()})
 
         return {
             "code": 200
@@ -573,3 +583,70 @@ class AccountController(BaseController):
     def set_time_to_first_time_in_day(cls, time):
         time_first = time.replace(hour=0, minute=0, second=0, microsecond=0)
         return time_first.timestamp()
+
+    def check_day_check_in(self):
+        body = request.args
+        time = body.get("time")
+        if not time:
+            return jsonify(self.get_error("Time not null")), 413
+
+        time_first = self.set_time_to_first_time_in_day(Date.convert_str_to_date(time, "%d/%m/%Y"))
+
+        status = "no"
+        if CalenderCheckIn().filter_one({CalenderCheckIn.time: time_first}):
+            status = "yes"
+
+        return {
+            "code": 200,
+            "status": status
+        }
+
+    def list_account_check_in_by_day(self):
+        param = request.args
+        time = param.get("time")
+        if not time:
+            return jsonify(self.get_error("Time not null")), 413
+
+        time_first = self.set_time_to_first_time_in_day(Date.convert_str_to_date(time, "%d/%m/%Y"))
+
+        list_checkin = CheckIn().find({CheckIn.time: time_first})
+
+        time_work_convert = {}
+        for i in list_checkin:
+            id_account = i.get(CheckIn.account_id)
+            time_work = i.get(CheckIn.time_work)
+
+            time_work_convert.update({id_account: time_work})
+
+        projection = {
+            "_id": 0,
+            AccountField.phone: 1,
+            AccountField.username: 1,
+            AccountField.fullname: 1,
+            AccountField.email: 1,
+            AccountField.role: 1
+        }
+        list_account = AccountModel().find({AccountField.role: {"$ne": AccountField.Role.client}}, projection=projection)
+        for account in list_account:
+            id_account = account.get(AccountField.id)
+            account.update({"time_work": time_work_convert.get(id_account, 0)})
+
+        return {
+            "code": 200,
+            "data": list_account
+        }
+
+    def list_account_not_client(self):
+        projection = {
+            "_id": 0,
+            AccountField.phone: 1,
+            AccountField.username: 1,
+            AccountField.fullname: 1,
+            AccountField.email: 1,
+            AccountField.role: 1
+        }
+        list_account = AccountModel().find({AccountField.role: {"$ne": AccountField.Role.client}}, projection=projection)
+        return {
+            "code": 200,
+            "data": list_account
+        }
