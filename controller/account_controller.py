@@ -174,7 +174,7 @@ class AccountController(BaseController):
         if check_lock:
             LockAccountModel().delete_many_data({LockAccountModel.account_id: check_exits.get(AccountField.id)})
 
-        self.set_account_online(check_exits.get(AccountField.id))
+        # self.set_account_online(check_exits.get(AccountField.id))
         token = self.create_jwt(check_exits)
         return {
             "code": 200,
