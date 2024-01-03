@@ -8,7 +8,7 @@ class ROLE:
     LIST_ROLE = [ADMIN, MANAGER, USER]
 
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = "shoe_store"
 
 
 class PAGINATION:
