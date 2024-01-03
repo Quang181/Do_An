@@ -539,9 +539,11 @@ class AccountController(BaseController):
 
     def account_not_in_team(self):
         check_account = TeamAssignModel().find({})
-
-        account_ids = [i.get(TeamAssignModel.id_account) for i in check_account]
-        list_account = AccountModel().find({AccountField.id: {"$nin": account_ids}})
+        if not check_account:
+            list_account = AccountModel().find({AccountField.role: {"$ne": AccountField.Role.client}})
+        else:
+            account_ids = [i.get(TeamAssignModel.id_account) for i in check_account]
+            list_account = AccountModel().find({AccountField.id: {"$nin": account_ids}})
 
         data_response = []
         for i in list_account:

@@ -12,7 +12,7 @@ def login():
 
 
 @account.route(ACCOUNT.ACCOUNT, methods=[METHOD.POST])
-# @token_required
+@token_required
 def create_account():
     return AccountController().create_account()
 
@@ -24,7 +24,7 @@ def update_account(account_id):
 
 
 @account.route(ACCOUNT.ACCOUNT, methods={METHOD.DELETE})
-# @token_required
+@token_required
 def delete_account():
     return AccountController().delete_account()
 
@@ -40,45 +40,54 @@ def change_password():
 
 
 @account.route(ACCOUNT.LIST_ROLE, methods={METHOD.GET})
+@token_required
 def list_role():
     return AccountController().get_role()
 
 
 @account.route(ACCOUNT.LIST_STATUS, methods={METHOD.GET})
+@token_required
 def get_status():
     return AccountController().status_account()
 
 
 @account.route(ACCOUNT.ACCOUNT, methods={METHOD.GET})
+@token_required
 def get_list_account():
     return AccountController().get_list_account()
 
 
 @account.route(ACCOUNT.DETAIL_ACCOUNT, methods={METHOD.GET})
+@token_required
 def detail_account(account_id):
     return AccountController().detail_account(account_id)
 
 
 @account.route(ACCOUNT.ACCOUNT_CLIENT, methods={METHOD.POST})
+@token_required
 def create_account_client():
     return AccountController().create_account_client()
 
 
 @account.route(ACCOUNT.ACCOUNT_CLIENT, methods={METHOD.POST})
+@token_required
 def get_info_account_by_ids():
     return AccountController().get_info_account_by_ids()
 
 
 @account.route(ACCOUNT.ACCOUNT_CHECK_IN, methods={METHOD.POST})
+@token_required
 def check_in_account():
     return AccountController().check_in_account()
 
 
 @account.route(ACCOUNT.GET_WAGE, methods={METHOD.GET})
+@token_required
 def get_wage_account(account_id):
     return AccountController().get_wage_account(account_id)
 
 
 @account.route(ACCOUNT.ACCOUNT_NOT_TEAM, methods={METHOD.GET})
+@token_required
 def account_not_in_team():
     return AccountController().account_not_in_team()
