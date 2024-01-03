@@ -503,9 +503,9 @@ class AccountController(BaseController):
             "code": 200
         }
 
-    def get_wage_account(self):
-        param = request.json
-        account_id = param.get("account_id")
+    def get_wage_account(self, account_id):
+        # param = request.json
+        # # account_id = param.get("account_id")
         time_now = datetime.datetime.now()
         month = time_now.month
         year = time_now.year

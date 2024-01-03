@@ -12,7 +12,7 @@ def login():
 
 
 @account.route(ACCOUNT.ACCOUNT, methods=[METHOD.POST])
-@token_required
+# @token_required
 def create_account():
     return AccountController().create_account()
 
@@ -75,8 +75,8 @@ def check_in_account():
 
 
 @account.route(ACCOUNT.GET_WAGE, methods={METHOD.GET})
-def get_wage_account():
-    return AccountController().get_wage_account()
+def get_wage_account(account_id):
+    return AccountController().get_wage_account(account_id)
 
 
 @account.route(ACCOUNT.ACCOUNT_NOT_TEAM, methods={METHOD.GET})
