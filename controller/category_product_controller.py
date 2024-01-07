@@ -3,6 +3,7 @@ from pymongo import DESCENDING
 from controller.base_controller import BaseController
 from model.mongo.category_product_model import CategoryProductModel
 from flask import request, jsonify
+import copy
 
 
 class CategoryProductController(BaseController):
@@ -15,22 +16,25 @@ class CategoryProductController(BaseController):
         if not name:
             return jsonify(self.get_error("Name not null")), 413
 
-        check_name = CategoryProductModel({CategoryProductModel.name: name})
+        check_name = CategoryProductModel().filter_one({CategoryProductModel.name: name})
         if check_name:
             return jsonify(self.get_error("Tên loại sản phẩm đã tồn tại")), 413
 
         id_category = self.generate_uuid()
-        insert_category = CategoryProductModel().insert_one({CategoryProductModel.id: id_category,
-                                                             CategoryProductModel.name: name,
-                                                             CategoryProductModel.describe: describe,
-                                                             CategoryProductModel.status: 1,
-                                                             **self.this_moment_create()})
+        data_insert = {CategoryProductModel.id: id_category,
+                       CategoryProductModel.name: name,
+                       CategoryProductModel.describe: describe,
+                       CategoryProductModel.status: "active",
+                       **self.this_moment_create()}
+
+        data_return = copy.deepcopy(data_insert)
+        insert_category = CategoryProductModel().insert_one(data_insert)
         if not insert_category:
             return jsonify(self.get_error("Thêm loại sản phẩm thất bại")), 413
 
-        body.update({CategoryProductModel.id: id_category})
         return {
-            "data": body
+            "code": 200,
+            "data": data_return
         }
 
     def update_category(self, id_category):
@@ -58,17 +62,20 @@ class CategoryProductController(BaseController):
             CategoryProductModel().update_one({CategoryProductModel.id: id_category},
                                               data_update)
             return {
+                "code": 200,
                 "data": body
             }
         else:
             return jsonify(self.get_error("Data not null")), 413
 
-    def delete_category(self, id_category):
-        check_exits = CategoryProductModel().filter_one({CategoryProductModel.id: id_category})
-        if not check_exits:
+    def delete_category(self):
+        body = request.json
+        ids_category = body.get("ids_category")
+        check_exits = CategoryProductModel().find({CategoryProductModel.id: {"$in": ids_category}})
+        if len(ids_category) != len(check_exits):
             return jsonify(self.get_error("Loại sản phẩm không tồn tại ")), 413
 
-        delete_category = CategoryProductModel().delete_many_data({CategoryProductModel.id: id_category})
+        delete_category = CategoryProductModel().delete_many_data({CategoryProductModel.id: {"$in": ids_category}})
         if not delete_category:
             return jsonify(self.get_error("Xóa thất bại ")), 413
 
@@ -80,16 +87,23 @@ class CategoryProductController(BaseController):
         param = request.args
         paging = self.generate_paging_from_args(param)
         status = param.get(CategoryProductModel.status)
+        name = param.get("name")
 
         sort_options = [(CategoryProductModel.update_on, DESCENDING)]
         data_query = {}
+        projection = {
+            "_id": 0
+        }
+        if name:
+            data_query.update({CategoryProductModel.name: {"$regex": name}})
         if status:
             data_query.update({CategoryProductModel.status: status})
 
-        list_category = CategoryProductModel().get_list_entity(data_query, paging, sort_options=sort_options)
+        list_category = CategoryProductModel().get_list_entity(data_query, paging,projection=projection, sort_options=sort_options)
         paginated = self.get_info_paging_for_response(list_category, paging)
 
         return {
+            "code": 200,
             "data": list_category,
             "paging": paginated
         }
@@ -106,5 +120,6 @@ class CategoryProductController(BaseController):
             }
         ]
         return {
+            "code": 200,
             "data": data
         }

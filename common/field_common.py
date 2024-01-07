@@ -41,7 +41,8 @@ class ACCOUNT:
 
 
 class CATEGORY:
-    CATEGORYS = "/category"
+    CATEGORY = "/category"
+    UPDATE_CATEGORY = "/category/<id_category>"
     LIST_STATUS = "/category/status"
 
 

@@ -6,22 +6,22 @@ from common.field_common import CATEGORY, METHOD
 category = Blueprint("category", __name__)
 
 
-@category.route(CATEGORY.CATEGORYS, methods=[METHOD.POST])
+@category.route(CATEGORY.CATEGORY, methods=[METHOD.POST])
 def add_category():
     return CategoryProductController().add_category()
 
 
-@category.route(CATEGORY.CATEGORYS, methods=[METHOD.PATCH])
+@category.route(CATEGORY.UPDATE_CATEGORY, methods=[METHOD.PATCH])
 def update_category(id_category):
     return CategoryProductController().update_category(id_category)
 
 
-@category.route(CATEGORY.CATEGORYS, methods=[METHOD.DELETE])
-def delete_category(id_category):
-    return CategoryProductController().delete_category(id_category)
+@category.route(CATEGORY.CATEGORY, methods=[METHOD.POST])
+def delete_category():
+    return CategoryProductController().delete_category()
 
 
-@category.route(CATEGORY.CATEGORYS, methods=[METHOD.GET])
+@category.route(CATEGORY.CATEGORY, methods=[METHOD.GET])
 def list_category():
     return CategoryProductController().list_category()
 
