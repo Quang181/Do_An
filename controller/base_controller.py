@@ -15,7 +15,8 @@ class BaseController:
             # return 401 if token is not passed
         if not token:
             return jsonify({'message': 'Token is missing !!'}), 401
-
+        token = token.split("Bearer")
+        token = token[1].strip()
         data = jwt.decode(token, SECRET_KEY, algorithms="HS256")
         return data.get(key)
 
