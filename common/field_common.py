@@ -58,3 +58,8 @@ class METHOD:
     PUT = "put"
     DELETE = "delete"
     PATCH = "patch"
+
+
+class PRODUCT:
+    PRODUCT = "/product"
+    PRODUCT_UPDATE = "/product/<id_product>"

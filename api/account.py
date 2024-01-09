@@ -7,40 +7,40 @@ account = Blueprint("account", __name__)
 
 
 @account.route(ACCOUNT.LOGIN, methods=[METHOD.POST])
-@cross_origin(origins="*")
+#@cross_origin(origins="*")
 def login():
     return AccountController().login()
 
 
 @account.route(ACCOUNT.ACCOUNT, methods=[METHOD.POST])
-@cross_origin(origins="*")
+#@cross_origin(origins="*")
 @token_required
 def create_account():
     return AccountController().create_account()
 
 
 @account.route(ACCOUNT.ACCOUNT_UPDATE, methods={METHOD.PATCH})
-@cross_origin(origins="*")
+#@cross_origin(origins="*")
 @token_required
 def update_account(account_id):
     return AccountController().update_account(account_id)
 
 
 @account.route(ACCOUNT.ACCOUNT, methods={METHOD.DELETE})
-@cross_origin(origins="*")
+#@cross_origin(origins="*")
 @token_required
 def delete_account():
     return AccountController().delete_account()
 
 
 @account.route(ACCOUNT.FORGET_PASSWORD, methods={METHOD.POST})
-@cross_origin(origins="*")
+#@cross_origin(origins="*")
 def forget_password():
     return AccountController().forget_password()
 
 
 @account.route(ACCOUNT.CHANGE_PASSWORD, methods={METHOD.POST})
-@cross_origin(origins="*")
+#@cross_origin(origins="*")
 def change_password():
     return AccountController().check_random_str()
 

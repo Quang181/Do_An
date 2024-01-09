@@ -4,7 +4,7 @@ import string
 import jwt
 
 from controller.base_controller import BaseController
-from flask import request, jsonify
+from flask import request, jsonify, make_response
 from common.field_common import ROLE, SECRET_KEY
 import hashlib
 import hmac
@@ -141,14 +141,15 @@ class AccountController(BaseController):
 
         check_exits = AccountModel().filter_one({AccountField.username: username})
         if not check_exits:
-            return jsonify(self.get_error("Tài khoản không tồn tại")), 413
+            return jsonify(self.get_error("Tai khoan hoac mat khau khong ton tai")), 413
+
 
         new_password = hmac.new(bytes(SECRET_KEY, 'utf-8'), password.encode('utf-8'), hashlib.sha256).hexdigest()
         check_lock = LockAccountModel().filter_one({LockAccountModel.account_id: check_exits.get(AccountField.id)})
 
         if check_lock.get(LockAccountModel.status) == "lock" and check_lock.get(
                 LockAccountModel.time_login) > self.get_timestamp_now():
-            return jsonify(self.get_error("Tài khoản bị khóa trong 1 phút vui lòng thử lại sau !"))
+            return jsonify(self.get_error("Tài khoản bị khóa trong 1 phút vui lòng thử lại sau !")), 413
 
         if check_exits.get(AccountField.password) != new_password:
             if check_exits and check_lock.get(LockAccountModel.number_login, 0) >= 3:
