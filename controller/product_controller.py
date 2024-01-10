@@ -155,7 +155,7 @@ class ProductController(BaseController):
         if time:
             time_check_in = Date.convert_str_to_date(time, "%d/%m/%Y:%H:%M:%S")
         else:
-            ti
+            pass
     def set_str_to_date(self, date):
         date = date.replace(hour=12, minute=0, second=0, microsecond=0)
         return date
