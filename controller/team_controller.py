@@ -139,7 +139,20 @@ class TeamController(BaseController):
         for team in list_data.get("list_data"):
             id_team = team.get(TeamModel.id)
 
-            team.update({"accounts": convert_account_by_team.get(id_team, [])})
+            list_ids_account = convert_account_by_team.get(id_team)
+
+            if list_ids_account:
+                list_account_info = AccountModel().find({AccountField.id: {"$in": list_ids_account}},
+                                                        projection={"_id": 0,
+                                                                    AccountField.id: 1,
+                                                                    AccountField.phone: 1,
+                                                                    AccountField.email: 1,
+                                                                    AccountField.fullname: 1,
+                                                                    AccountField.role: 1})
+            else:
+                list_account_info = []
+
+            team.update({"accounts": list_account_info})
 
         return {
             "code": 200,
