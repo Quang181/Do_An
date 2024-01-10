@@ -644,7 +644,8 @@ class AccountController(BaseController):
             AccountField.username: 1,
             AccountField.fullname: 1,
             AccountField.email: 1,
-            AccountField.role: 1
+            AccountField.role: 1,
+            AccountField.id: 1
         }
         list_account = AccountModel().find({AccountField.role: {"$ne": AccountField.Role.client}}, projection=projection)
         return {
