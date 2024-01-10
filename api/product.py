@@ -12,7 +12,7 @@ def create_product():
     return ProductController().create_product()
 
 
-@product.route(PRODUCT.PRODUCT_UPDATE, methods=[METHOD.PATCH])
+@product.route(PRODUCT.PRODUCT_UPDATE, methods=[METHOD.POST])
 #@cross_origin(origins="*")
 @token_required
 def update_product(id_product):
