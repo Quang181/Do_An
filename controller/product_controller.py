@@ -136,57 +136,57 @@ class ProductController(BaseController):
             "paging": paginated
         }
 
-    def check_in_vila(self):
-        body = request.json
-
-        cccd = body.get("cccd")
-        name = body.get("name")
-        phone = body.get("phone")
-        email = body.get("email")
-        id_product = body.get("id_product")
-        status = body.get("status")
-        time_check_in = body.get(CheckInProduct.time_check_in)
-        time_check_out = body.get(CheckInProduct.time_check_out)
-
-        if not status:
-            return jsonify(self.get_error("status not null")), 413
-
-        if status != CheckInProduct.Status.pre_order:
-            return jsonify(self.get_error("Status khong hop le")), 413
-
-        for i in [CheckInProduct.cccd, CheckInProduct.name, CheckInProduct.phone, CheckInProduct.email,
-                  CheckInProduct.id_product, CheckInProduct.time_check_in, CheckInProduct.time_check_out]:
-            if not body.get(i):
-                return jsonify(self.get_error("{} not null".format(i))), 413
-
-        check_exits = ProductModel().filter_one({ProductModel.id: id_product})
-        if not check_exits:
-            return jsonify(self.get_error("id product not exits")), 413
-
-        check_exits_category = CategoryProductModel().filter_one(
-            {CategoryProductModel.id: check_exits.get(ProductModel.id_category),
-             CategoryProductModel.name: "Vila"})
-        if not check_exits_category:
-            return jsonify(self.get_error("Product not Vila")), 413
-        time_check_in = Date.convert_str_to_date(time_check_in, "%d/%m/%Y:%H:%M:%S")
-        time_check_out = Date.convert_str_to_date(time_check_out, "%d/%m/%Y:%H:%M:%S")
-
-        check_exits = CheckInProduct().filter_one({CheckInProduct.id_product: id_product,
-                                                   CheckInProduct.status: {"$ne": CheckInProduct.Status.check_out},
-                                                   "$or": [
-                                                       {CheckInProduct.time_check_in: {"$lte": time_check_in},
-                                                        CheckInProduct.time_check_out: {"$gte": time_check_out}},
-                                                       {
-                                                           CheckInProduct.time_check_in: {"$lte": time_check_out},
-                                                           CheckInProduct.time_check_out: {"$gte": time_check_out}
-                                                       }
-                                                   ]})
-        if check_exits:
-            return jsonify(self.get_error("Phòng đã có khách hàng đặt trước trong khoảng thời gian đó")), 413
-        return {
-            "code": 200
-        }
-        
+    # def check_in_vila(self):
+    #     body = request.json
+    #
+    #     cccd = body.get("cccd")
+    #     name = body.get("name")
+    #     phone = body.get("phone")
+    #     email = body.get("email")
+    #     id_product = body.get("id_product")
+    #     status = body.get("status")
+    #     time_check_in = body.get(CheckInProduct.time_check_in)
+    #     time_check_out = body.get(CheckInProduct.time_check_out)
+    #
+    #     if not status:
+    #         return jsonify(self.get_error("status not null")), 413
+    #
+    #     if status != CheckInProduct.Status.pre_order:
+    #         return jsonify(self.get_error("Status khong hop le")), 413
+    #
+    #     for i in [CheckInProduct.cccd, CheckInProduct.name, CheckInProduct.phone, CheckInProduct.email,
+    #               CheckInProduct.id_product, CheckInProduct.time_check_in, CheckInProduct.time_check_out]:
+    #         if not body.get(i):
+    #             return jsonify(self.get_error("{} not null".format(i))), 413
+    #
+    #     check_exits = ProductModel().filter_one({ProductModel.id: id_product})
+    #     if not check_exits:
+    #         return jsonify(self.get_error("id product not exits")), 413
+    #
+    #     check_exits_category = CategoryProductModel().filter_one(
+    #         {CategoryProductModel.id: check_exits.get(ProductModel.id_category),
+    #          CategoryProductModel.name: "Vila"})
+    #     if not check_exits_category:
+    #         return jsonify(self.get_error("Product not Vila")), 413
+    #     time_check_in = Date.convert_str_to_date(time_check_in, "%d/%m/%Y:%H:%M:%S")
+    #     time_check_out = Date.convert_str_to_date(time_check_out, "%d/%m/%Y:%H:%M:%S")
+    #
+    #     check_exits = CheckInProduct().filter_one({CheckInProduct.id_product: id_product,
+    #                                                CheckInProduct.status: {"$ne": CheckInProduct.Status.check_out},
+    #                                                "$or": [
+    #                                                    {CheckInProduct.time_check_in: {"$lte": time_check_in},
+    #                                                     CheckInProduct.time_check_out: {"$gte": time_check_out}},
+    #                                                    {
+    #                                                        CheckInProduct.time_check_in: {"$lte": time_check_out},
+    #                                                        CheckInProduct.time_check_out: {"$gte": time_check_out}
+    #                                                    }
+    #                                                ]})
+    #     if check_exits:
+    #         return jsonify(self.get_error("Phòng đã có khách hàng đặt trước trong khoảng thời gian đó")), 413
+    #     return {
+    #         "code": 200
+    #     }
+    #
     def set_str_to_date(self, date):
         date = date.replace(hour=12, minute=0, second=0, microsecond=0)
         return date
