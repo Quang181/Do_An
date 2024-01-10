@@ -1,6 +1,4 @@
 from flask import Blueprint
-from flask_cors import cross_origin
-
 from controller.product_controller import ProductController
 from auth.auth import token_required
 from common.field_common import PRODUCT, METHOD
@@ -8,9 +6,8 @@ from common.field_common import PRODUCT, METHOD
 product = Blueprint("product", __name__)
 
 
-@product.route(PRODUCT.PRODUCT_UPDATE, methods=[METHOD.POST])
-#@cross_origin(origins="*")
-@token_required
+@product.route(PRODUCT.PRODUCT, methods=[METHOD.POST])
+# @token_required
 def create_product():
     return ProductController().create_product()
 
@@ -31,6 +28,6 @@ def delete_product():
 
 @product.route(PRODUCT.PRODUCT, methods=[METHOD.GET])
 #@cross_origin(origins="*")
-@token_required
+# @token_required
 def get_list_product():
     return ProductController().get_list_product()

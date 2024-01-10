@@ -1,3 +1,4 @@
+import copy
 import datetime
 
 from pymongo import DESCENDING
@@ -19,6 +20,10 @@ class ProductController(BaseController):
         price = body.get(ProductModel.price)
         image = body.get(ProductModel.image)
         account_id = self.get_info_in_token("id")
+        # account_id = "0885d4a6-af07-11ee-8f5a-5559e80602f2"
+        for i in [ProductModel.name, ProductModel.id_category, ProductModel.price]:
+            if not body.get(i):
+                return jsonify(self.get_error("{} not null".format(i))), 413
 
         if not CategoryProductModel().find({CategoryProductModel.id: id_category}):
             return jsonify(self.get_error("Loại sản phẩm không tồn tại ")), 413
@@ -35,6 +40,7 @@ class ProductController(BaseController):
             ProductModel.price: price,
             ProductModel.account_id: account_id
         }
+        data_return = copy.deepcopy(data_insert)
         insert_data = ProductModel().insert_one(data_insert)
 
         if not insert_data:
@@ -42,7 +48,7 @@ class ProductController(BaseController):
 
         return {
             "code": 200,
-            "data": data_insert
+            "data": data_return
         }
 
     def update_product(self, id_product):
@@ -96,7 +102,7 @@ class ProductController(BaseController):
             query.update({ProductModel.id_category: {"$in": ids_category}})
         sort_options = [(CategoryProductModel.update_on, DESCENDING)]
         list_data = ProductModel().get_list_entity(query, paging, {"_id": 0}, sort_options)
-        paginated = self.get_info_paging_for_response(list_data.get("list_data"), paging)
+        paginated = self.get_info_paging_for_response(list_data, paging)
 
         return {
             "code": 200,
@@ -149,7 +155,7 @@ class ProductController(BaseController):
         if time:
             time_check_in = Date.convert_str_to_date(time, "%d/%m/%Y:%H:%M:%S")
         else:
-            t
+            ti
     def set_str_to_date(self, date):
         date = date.replace(hour=12, minute=0, second=0, microsecond=0)
         return date

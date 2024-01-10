@@ -26,7 +26,7 @@ def update_account(account_id):
     return AccountController().update_account(account_id)
 
 
-@account.route(ACCOUNT.ACCOUNT, methods={METHOD.DELETE})
+@account.route(ACCOUNT.ACCOUNT, methods={METHOD.POST})
 #@cross_origin(origins="*")
 @token_required
 def delete_account():

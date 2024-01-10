@@ -17,8 +17,9 @@ def token_required(f):
             return jsonify({'message': 'Token is missing !!'}), 401
 
             # decoding the payload to fetch the stored details
-        token = token.split("Bearer")
-        token = token[1].strip()
+        if "Bearer" in token:
+            token = token.split("Bearer")
+            token = token[1].strip()
         data = jwt.decode(token, SECRET_KEY, algorithms="HS256")
         current_user = AccountModel().find({AccountField.id: data.get(AccountField.id)})
         if not current_user:

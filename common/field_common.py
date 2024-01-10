@@ -25,6 +25,7 @@ class PAGINATION:
 class ACCOUNT:
     LOGIN = "/login"
     ACCOUNT = "/account"
+    ACCOUNT_DELETE = "/account/delete"
     ACCOUNT_UPDATE = "/account/<account_id>"
     FORGET_PASSWORD = "/forget-password"
     CHANGE_PASSWORD = "/forget/change-password"
