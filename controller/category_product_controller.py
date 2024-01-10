@@ -104,7 +104,7 @@ class CategoryProductController(BaseController):
 
         return {
             "code": 200,
-            "data": list_category,
+            "data": list_category.get("list_data"),
             "paging": paginated
         }
 
