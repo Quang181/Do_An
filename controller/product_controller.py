@@ -37,7 +37,7 @@ class ProductController(BaseController):
             url_file = url_file[0] + "image"
             filename = secure_filename(image.filename)
             image.save(os.path.join(url_file, filename))
-            image = url_file + "/" + filename
+            image = "http://52.63.96.9:5000" + url_file + "/" + filename
 
         if not CategoryProductModel().find({CategoryProductModel.id: id_category}):
             return jsonify(self.get_error("Loại sản phẩm không tồn tại ")), 413
