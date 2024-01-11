@@ -10,6 +10,10 @@ from model.mongo.category_product_model import CategoryProductModel
 from tools.string_tools import StringTool
 from common.date import Date
 from model.mongo.check_in_product import CheckInProduct
+import cv2
+import os
+from werkzeug.utils import secure_filename
+
 
 class ProductController(BaseController):
 
@@ -19,15 +23,24 @@ class ProductController(BaseController):
         id_category = body.get(ProductModel.id_category)
         price = body.get(ProductModel.price)
         image = request.files.get("image")
-        account_id = self.get_info_in_token("id")
+        # account_id = self.get_info_in_token("id")
         # account_id = "0885d4a6-af07-11ee-8f5a-5559e80602f2"
         for i in [ProductModel.name, ProductModel.id_category, ProductModel.price]:
             if not body.get(i):
                 return jsonify(self.get_error("{} not null".format(i))), 413
 
+        if image:
+            url_file = os.path.dirname(__file__)
+            # url_file = url_file + "image"
+            # if "controller" in url_file:
+            url_file = url_file.split("controller")
+            url_file = url_file[0] + "image"
+            filename = secure_filename(image.filename)
+            image.save(os.path.join(url_file, filename))
+            image = url_file + "/" + filename
+
         if not CategoryProductModel().find({CategoryProductModel.id: id_category}):
             return jsonify(self.get_error("Loại sản phẩm không tồn tại ")), 413
-        pwd = "/opt/deploy/shoe-store"
         if ProductModel().filter_one({ProductModel.name: name}):
             return jsonify(self.get_error("Sản phẩm đã tồn tại")), 413
 
@@ -38,7 +51,7 @@ class ProductController(BaseController):
             ProductModel.image: image,
             ProductModel.id_category: id_category,
             ProductModel.price: price,
-            ProductModel.account_id: account_id
+            # ProductModel.account_id: account_id
         }
         data_return = copy.deepcopy(data_insert)
         insert_data = ProductModel().insert_one(data_insert)
