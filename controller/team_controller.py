@@ -125,17 +125,21 @@ class TeamController(BaseController):
         ids_team = [i.get(TeamModel.id) for i in list_data.get("list_data")]
 
         convert_account_by_team = {}
+        position_by_id = {}
         if ids_team:
             list_account = TeamAssignModel().find({TeamAssignModel.id_team: {"$in": ids_team}})
 
             for account_assign in list_account:
                 id_team = account_assign.get(TeamAssignModel.id_team)
                 id_account = account_assign.get(TeamAssignModel.id_account)
-
+                position = account_assign.get(TeamAssignModel.position)
                 if id_team in convert_account_by_team:
                     convert_account_by_team.get(id_team).append(id_account)
                 else:
                     convert_account_by_team.update({id_team: [id_account]})
+
+                position_by_id.update({TeamAssignModel.position: position})
+
         for team in list_data.get("list_data"):
             id_team = team.get(TeamModel.id)
 
@@ -149,6 +153,9 @@ class TeamController(BaseController):
                                                                     AccountField.email: 1,
                                                                     AccountField.fullname: 1,
                                                                     AccountField.role: 1})
+                for i in list_account_info:
+                    account_id = i.get(AccountField.id)
+                    i.update({TeamAssignModel.position: position_by_id.get(account_id, "")})
             else:
                 list_account_info = []
 

@@ -11,7 +11,6 @@ from tools.string_tools import StringTool
 from common.date import Date
 from model.mongo.check_in_product import CheckInProduct
 
-
 class ProductController(BaseController):
 
     def create_product(self):

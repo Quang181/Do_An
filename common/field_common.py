@@ -33,6 +33,7 @@ class ACCOUNT:
     LIST_STATUS = "/status"
     DETAIL_ACCOUNT = "/account/<account_id>"
     ACCOUNT_CLIENT = "/account/by_ids"
+    CREATE_ACCOUNT_CLIENT = "/account/client"
     ACCOUNT_CHECK_IN = "/account/check-in"
     GET_WAGE = "/account/<account_id>/get_wage"
     ACCOUNT_NOT_TEAM = "/account/not-team"

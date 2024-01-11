@@ -69,8 +69,8 @@ def detail_account(account_id):
     return AccountController().detail_account(account_id)
 
 
-@account.route(ACCOUNT.ACCOUNT_CLIENT, methods={METHOD.POST})
-@token_required
+@account.route(ACCOUNT.CREATE_ACCOUNT_CLIENT, methods={METHOD.POST})
+# @token_required
 def create_account_client():
     return AccountController().create_account_client()
 

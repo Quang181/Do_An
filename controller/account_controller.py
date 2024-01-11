@@ -73,8 +73,12 @@ class AccountController(BaseController):
         if not check_exits:
             return jsonify(self.get_error("Account id không tồn tại")), 413
 
-        for i in [AccountField.password, AccountField.fullname, AccountField.phone]:
+        for i in [AccountField.password, AccountField.fullname, AccountField.phone, AccountField.email, "verify_password", AccountField.role]:
             if body.get(i) and i == AccountField.password:
+
+                if body.get(i) != body.get("verify_password"):
+                    return jsonify(self.get_error("Password và Verify Password không được khác nhau")), 413
+
                 new_password = hmac.new(bytes(SECRET_KEY, "utf-8"), bytes(body.get(i), 'utf-8'),
                                         hashlib.sha256).hexdigest()
                 data_update.update({i: new_password})
@@ -227,6 +231,11 @@ class AccountController(BaseController):
         body = request.json
         username = body.get(AccountField.username)
         email = body.get(AccountField.email)
+        if not username:
+            return jsonify(self.get_error("User name not null")), 413
+
+        if not email:
+            return jsonify(self.get_error("Email not null")), 413
 
         check_exits = AccountModel().filter_one({AccountField.username: username})
         if not check_exits:
