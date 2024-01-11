@@ -10,7 +10,7 @@ from model.mongo.category_product_model import CategoryProductModel
 from tools.string_tools import StringTool
 from common.date import Date
 from model.mongo.check_in_product import CheckInProduct
-import cv2
+
 import os
 from werkzeug.utils import secure_filename
 
