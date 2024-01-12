@@ -73,7 +73,8 @@ class AccountController(BaseController):
         if not check_exits:
             return jsonify(self.get_error("Account id không tồn tại")), 413
 
-        for i in [AccountField.password, AccountField.fullname, AccountField.phone, AccountField.email, "verify_password", AccountField.role]:
+        for i in [AccountField.password, AccountField.fullname, AccountField.phone, AccountField.email,
+                  "verify_password", AccountField.role]:
             if body.get(i) and i == AccountField.password:
 
                 if body.get(i) != body.get("verify_password"):
@@ -146,7 +147,6 @@ class AccountController(BaseController):
         check_exits = AccountModel().filter_one({AccountField.username: username})
         if not check_exits:
             return jsonify(self.get_error("Tai khoan hoac mat khau khong ton tai")), 413
-
 
         new_password = hmac.new(bytes(SECRET_KEY, 'utf-8'), password.encode('utf-8'), hashlib.sha256).hexdigest()
         check_lock = LockAccountModel().filter_one({LockAccountModel.account_id: check_exits.get(AccountField.id)})
@@ -620,12 +620,18 @@ class AccountController(BaseController):
         time_first = self.set_time_to_first_time_in_day(Date.convert_str_to_date(time, "%d/%m/%Y"))
 
         list_checkin = CheckIn().find({CheckIn.time: time_first})
+        if not list_checkin:
+            return {
+                "code": 200,
+                "data": []
+            }
 
         time_work_convert = {}
+        id_account_query = []
         for i in list_checkin:
             id_account = i.get(CheckIn.account_id)
             time_work = i.get(CheckIn.time_work)
-
+            id_account_query.append(id_account)
             time_work_convert.update({id_account: time_work})
 
         projection = {
@@ -637,7 +643,9 @@ class AccountController(BaseController):
             AccountField.role: 1,
             AccountField.id: 1
         }
-        list_account = AccountModel().find({AccountField.role: {"$ne": AccountField.Role.client}}, projection=projection)
+        list_account = AccountModel().find({AccountField.role: {"$ne": AccountField.Role.client,
+                                                                AccountField.id: {"$in": id_account_query}}},
+                                           projection=projection)
         for account in list_account:
             id_account = account.get(AccountField.id)
             account.update({"time_work": time_work_convert.get(id_account, 0)})
@@ -657,7 +665,8 @@ class AccountController(BaseController):
             AccountField.role: 1,
             AccountField.id: 1
         }
-        list_account = AccountModel().find({AccountField.role: {"$ne": AccountField.Role.client}}, projection=projection)
+        list_account = AccountModel().find({AccountField.role: {"$ne": AccountField.Role.client}},
+                                           projection=projection)
         return {
             "code": 200,
             "data": list_account
