@@ -27,13 +27,13 @@ class Team(BaseModel):
                              describe=self.describe,
                              module_name=self.module_name)
 
-    @staticmethod
-    def update_team(field_update):
-        if field_update.get("name"):
-
-        if field_update.get("describe"):
-
-        if field_update.get("account_update"):
+    # @staticmethod
+    # def update_team(field_update):
+    #     if field_update.get("name"):
+    #
+    #     if field_update.get("describe"):
+    #
+    #     if field_update.get("account_update"):
 
     @staticmethod
     def delete_team(id_team):
