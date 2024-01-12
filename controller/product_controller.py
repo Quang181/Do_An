@@ -37,6 +37,7 @@ class ProductController(BaseController):
             url_file = url_file[0] + "image"
             filename = secure_filename(image.filename)
             image.save(os.path.join(url_file, filename))
+            #"http://52.63.96.9:5000"
             image = "http://52.63.96.9:5000" + url_file + "/" + filename
 
         if not CategoryProductModel().find({CategoryProductModel.id: id_category}):
@@ -222,3 +223,15 @@ class ProductController(BaseController):
             "code": 200,
             "data": data_return
         }
+
+    # def check_in(self):
+    #     body = request.json
+    #     start = body.get("start")
+    #     end = body.get("end")
+    #     id_product = body.get("id_product")
+    #
+    #     for i in ["start", "end", "id_product"]:
+    #         if not body.get(i):
+    #             return jsonify(self.get_error("{} not null".format(i))), 413
+    #
+    #     if CheckInProduct().filter_one()
