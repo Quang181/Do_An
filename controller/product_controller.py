@@ -13,6 +13,7 @@ from model.mongo.check_in_product import CheckInProduct
 from model.mongo.account_model import AccountModel, AccountField
 import os
 from werkzeug.utils import secure_filename
+import math
 
 
 class ProductController(BaseController):
@@ -329,25 +330,51 @@ class ProductController(BaseController):
         sort_options = [(CategoryProductModel.update_on, DESCENDING)]
         list_check_in = CheckInProduct().get_list_entity(data_query, paging, {"_id": 0}, sort_options)
         paginated = self.get_info_paging_for_response(list_check_in, paging)
+        ids_account = []
+        ids_product = []
+        convert_product = {}
+        convert_category = {}
+        for i in list_check_in.get("list_data"):
+            ids_account.append(i.get(CheckInProduct.id_account))
+            ids_product.append(i.get(CheckInProduct.id_product))
 
-        ids_account = [i.get(CheckInProduct.id_account) for i in list_check_in.get("list_data")]
+        if ids_product:
+            list_product = ProductModel().find({ProductModel.id: {"$in": ids_product}}, projection={"_id": 0, ProductModel.id_category: 1,
+                                                                                                    ProductModel.name: 1,
+                                                                                                    ProductModel.id: 1})
+            ids_category = []
+            for i in list_product:
+                convert_product.update({i.get(ProductModel.id): i})
+                ids_category.append(i.get(ProductModel.id_category))
+
+            if ids_category:
+                list_category = CategoryProductModel().find({CategoryProductModel.id: {"$in": ids_category}},
+                                                            projection={"_id": 0,
+                                                                        CategoryProductModel.id: 1,
+                                                                        CategoryProductModel.name:1})
+                for i in list_category:
+                    convert_category.update({i.get(CategoryProductModel.id): i})
 
         data_account = {}
         if ids_account:
             list_account = AccountModel().find({AccountField.id: {"$in": ids_account}}, projection={"_id": 0,
-                                                                                         AccountField.id: 1,
-                                                                                         AccountField.username: 1,
-                                                                                         AccountField.fullname: 1,
-                                                                                         AccountField.email: 1,
-                                                                                         AccountField.phone: 1,
-                                                                                         AccountField.role: 1})
+                                                                                                    AccountField.id: 1,
+                                                                                                    AccountField.username: 1,
+                                                                                                    AccountField.fullname: 1,
+                                                                                                    AccountField.email: 1,
+                                                                                                    AccountField.phone: 1,
+                                                                                                    AccountField.role: 1})
             for i in list_account:
                 id_account = i.get(AccountField.id)
                 data_account.update({id_account: i})
         for order in list_check_in.get("list_data"):
+            id_product = order.get(CheckInProduct.id_product)
             id_account = order.get(CheckInProduct.id_account)
             info_account = data_account.get(id_account, {})
             order.update({"info_account": info_account})
+            order.update({"info_product": convert_product.get(id_product, {})})
+            order.update({"info_category": convert_category.get(convert_product.get(id_product, {}).get(ProductModel.id_category))})
+
 
         return {
             "code": 200,
