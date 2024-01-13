@@ -10,7 +10,7 @@ from model.mongo.category_product_model import CategoryProductModel
 from tools.string_tools import StringTool
 from common.date import Date
 from model.mongo.check_in_product import CheckInProduct
-
+from model.mongo.account_model import AccountModel, AccountField
 import os
 from werkzeug.utils import secure_filename
 
@@ -37,8 +37,10 @@ class ProductController(BaseController):
             url_file = url_file[0] + "image"
             filename = secure_filename(image.filename)
             image.save(os.path.join(url_file, filename))
-            #"http://52.63.96.9:5000"
-            image = "http://52.63.96.9:5000" + url_file + "/" + filename
+            # "http://52.63.96.9:5000"
+            # image = "http://52.63.96.9:5000" + url_file + "/" + filename
+            # image = "http://52.63.96.9:5000" + url_file + "/" + filename
+            image = url_file + "/" + filename
 
         if not CategoryProductModel().find({CategoryProductModel.id: id_category}):
             return jsonify(self.get_error("Loại sản phẩm không tồn tại ")), 413
@@ -224,14 +226,151 @@ class ProductController(BaseController):
             "data": data_return
         }
 
-    # def check_in(self):
+    def pre_order(self):
+        body = request.json
+        start = body.get("start")
+        end = body.get("end")
+        id_product = body.get("id_product")
+        id_account = body.get("id_account")
+
+        for i in ["start", "end", "id_product", "id_account"]:
+            if not body.get(i):
+                return jsonify(self.get_error("{} not null".format(i))), 413
+
+        if not ProductModel().filter_one({ProductModel.id: id_product}):
+            return jsonify(self.get_error("San pham khong ton tai")), 413
+        start = Date.convert_str_to_date(start, "%d/%m/%Y")
+        end = Date.convert_str_to_date(end, "%d/%m/%Y")
+        start = Date.convert_date_to_timestamp(start)
+        end = Date.convert_date_to_timestamp(end)
+        if not AccountModel().filter_one({AccountField.id: id_account}):
+            return jsonify(self.get_error("Account note exits")), 413
+
+        if CheckInProduct().filter_one({"$or": [
+            {CheckInProduct.time_check_in: {"$lte": start},
+             CheckInProduct.time_check_out: {"$gte": start}},
+            {CheckInProduct.time_check_in: {"$lte": end},
+             CheckInProduct.time_check_out: {"$gte": end}}]}):
+            return jsonify(self.get_error("Phòng đã có người đặt trước đó ")), 413
+        id_orderr = self.generate_uuid()
+        data_iinsert = {
+            CheckInProduct.id: id_orderr,
+            CheckInProduct.id_product: id_product,
+            CheckInProduct.status: CheckInProduct.Status.pre_order,
+            CheckInProduct.time_check_in: start,
+            CheckInProduct.time_check_out: end,
+            CheckInProduct.id_account: id_account,
+            **self.this_moment_create()
+        }
+        data_return = copy.deepcopy(data_iinsert)
+        insert = CheckInProduct().insert_one(data_iinsert)
+
+        return {
+            "code": 200,
+            "data": data_return
+        }
+
+    def check_in(self, id_order):
+        check_exit = CheckInProduct().filter_one({CheckInProduct.id: id_order})
+
+        if not check_exit:
+            return jsonify(self.get_error("ID khong ton tai")), 413
+
+        CheckInProduct().update_one({CheckInProduct.id: id_order},
+                                    {CheckInProduct.status: CheckInProduct.Status.check_in,
+                                     **self.this_moment_update()})
+
+        data_return = CheckInProduct().filter_one({CheckInProduct.id: id_order}, {"_id": 0})
+        return {
+            "code": 200,
+            "data": data_return
+        }
+
+    # def check_out(self):
     #     body = request.json
-    #     start = body.get("start")
-    #     end = body.get("end")
+    #     time = body.get("time")
     #     id_product = body.get("id_product")
+    #     id_account = body.get("id_account")
+    #     product = body.get("product")
+    #     list_product = [i.get("id_product") for i in product]
+    #     list_product.append(id_product)
+    #     check_exist = ProductModel().find({ProductModel.id: {"$in": list_product}})
+    #     if len(list_product) != len(check_exist):
+    #         return jsonify(self.get_error("ID product not exits")), 413
     #
-    #     for i in ["start", "end", "id_product"]:
-    #         if not body.get(i):
-    #             return jsonify(self.get_error("{} not null".format(i))), 413
+    #     check_exits_account = AccountModel().filter_one({AccountField.id: id_account})
+    #     if not check_exits_account:
+    #         return jsonify(self.get_error("Account not exits")), 413
     #
-    #     if CheckInProduct().filter_one()
+    #     info_check_in = CheckInProduct().filter_one({CheckInProduct.id: ch})
+
+    def list_order(self):
+        params = request.args
+        paging = self.generate_paging_from_args(params)
+        name_room = params.get("name")
+        status = params.get("status")
+        start = params.get("start")
+        end = params.get("end")
+
+        data_query = {}
+        if status:
+            status = StringTool(status).separate_string_by_comma()
+            data_query.update({CheckInProduct.status: {"$in": status}})
+        if name_room:
+            data_query.update({CheckInProduct.name: name_room})
+        if start and end:
+            start = Date.convert_str_to_date(start, "%d/%m/%Y")
+            end = Date.convert_str_to_date(end, "%d/%m/%Y")
+
+            data_query.update({
+                CheckInProduct.time_check_in: {"$gte": start},
+                CheckInProduct.time_check_out: {"$lte": end}
+            })
+        sort_options = [(CategoryProductModel.update_on, DESCENDING)]
+        list_check_in = CheckInProduct().get_list_entity(data_query, paging, {"_id": 0}, sort_options)
+        paginated = self.get_info_paging_for_response(list_check_in, paging)
+
+        ids_account = [i.get(CheckInProduct.id_account) for i in list_check_in.get("list_data")]
+
+        data_account = {}
+        if ids_account:
+            list_account = AccountModel().find({AccountField.id: {"$in": ids_account}}, projection={"_id": 0,
+                                                                                         AccountField.id: 1,
+                                                                                         AccountField.username: 1,
+                                                                                         AccountField.fullname: 1,
+                                                                                         AccountField.email: 1,
+                                                                                         AccountField.phone: 1,
+                                                                                         AccountField.role: 1})
+            for i in list_account:
+                id_account = i.get(AccountField.id)
+                data_account.update({id_account: i})
+        for order in list_check_in.get("list_data"):
+            id_account = order.get(CheckInProduct.id_account)
+            info_account = data_account.get(id_account, {})
+            order.update({"info_account": info_account})
+
+        return {
+            "code": 200,
+            "data": list_check_in.get("list_data"),
+            "paging": paginated
+        }
+
+    def status_order(self):
+        list_return = [
+            {
+                "key": CheckInProduct.Status.pre_order,
+                "name": "Đặt phòng"
+            },
+            {
+                "key": CheckInProduct.Status.check_in,
+                "name": "Check in"
+            },
+            {
+                "key": CheckInProduct.Status.check_out,
+                "name": "Check out"
+            }
+        ]
+        return {
+            "code": 200,
+            "data": list_return
+        }
