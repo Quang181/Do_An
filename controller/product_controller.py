@@ -132,7 +132,7 @@ class ProductController(BaseController):
         paging = self.generate_paging_from_args(param)
         sort_options = [(CategoryProductModel.update_on, DESCENDING)]
         list_data = ProductModel().get_list_entity({ProductModel.name: "Vila"}, paging, {"_id": 0}, sort_options)
-        paginated = self.get_info_paging_for_response(list_data.get("list_data"), paging)
+        paginated = self.get_info_paging_for_response(list_data, paging)
         return {
             "code": 200,
             "data": list_data.get("list_data"),
@@ -145,7 +145,7 @@ class ProductController(BaseController):
         sort_options = [(CategoryProductModel.update_on, DESCENDING)]
         list_data = ProductModel().get_list_entity({ProductModel.name: {"$nin": ["Vila"]}}, paging, {"_id": 0},
                                                    sort_options)
-        paginated = self.get_info_paging_for_response(list_data.get("list_data"), paging)
+        paginated = self.get_info_paging_for_response(list_data, paging)
         return {
             "code": 200,
             "data": list_data.get("list_data"),
@@ -377,7 +377,7 @@ class ProductController(BaseController):
 
 
         return {
-            "code": 200,
+             "code": 200,
             "data": list_check_in.get("list_data"),
             "paging": paginated
         }

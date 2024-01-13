@@ -58,3 +58,15 @@ def status_order():
 @token_required
 def list_order():
     return ProductController().list_order()
+
+
+@product.route(PRODUCT.PRODUCT_VILA, methods=[METHOD.GET])
+@token_required
+def get_list_vila():
+    return ProductController().get_list_vila()
+
+
+@product.route(PRODUCT.PRODUCT_NOT_VILA, methods=[METHOD.GET])
+@token_required
+def get_list_product_not_vila():
+    return ProductController().get_list_product_not_vila()

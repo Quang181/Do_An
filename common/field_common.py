@@ -70,3 +70,5 @@ class PRODUCT:
     CHECK_OUT = "/check-out/room"
     STATUS_ORDER = "/status-order"
     ORDER = "/order"
+    PRODUCT_VILA = "/product/vila"
+    PRODUCT_NOT_VILA = "/product/not-vila"
