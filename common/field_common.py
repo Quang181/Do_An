@@ -65,8 +65,8 @@ class METHOD:
 class PRODUCT:
     PRODUCT = "/product"
     PRODUCT_UPDATE = "/product/<id_product>"
-    PRE_ORDER = "/pre_order"
+    PRE_ORDER = "/pre-order"
     CHECK_IN = "/check-in/<id_product>/room"
-    CHECK_OUT = "/check_out/room"
+    CHECK_OUT = "/check-out/room"
     STATUS_ORDER = "/status-order"
     ORDER = "/order"
