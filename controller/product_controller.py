@@ -295,34 +295,58 @@ class ProductController(BaseController):
             "data": data_return
         }
 
-    # def get_price_check_out(self, id_order):
-    #     body = request.json
-    #     time = body.get("time")
-    #     id_product = body.get("id_product")
-    #     id_account = body.get("id_account")
-    #     product = body.get("product")
-    #     list_product = [i.get("id_product") for i in product]
-    #     list_product.append(id_product)
-    #     check_exist = ProductModel().find({ProductModel.id: {"$in": list_product}})
-    #     if len(list_product) != len(check_exist):
-    #         return jsonify(self.get_error("ID product not exits")), 413
-    #
-    #     check_exits_account = AccountModel().filter_one({AccountField.id: id_account})
-    #     if not check_exits_account:
-    #         return jsonify(self.get_error("Account not exits")), 413
-    #
-    #     info_check_in = CheckInProduct().filter_one({CheckInProduct.id: id_order})
-    #     if not info_check_in:
-    #         return jsonify(self.get_error("Order not exist")), 413
-    #
-    #     get_price_by_product = {}
-    #     for i in check_exist:
-    #         product_id = i.get(ProductModel.id)
-    #         price = i.get(ProductModel.price)
-    #
-    #         get_price_by_product.update({product_id: price})
+    def get_price_check_out(self, id_order):
+        body = request.json
+        time = body.get("time")
+        id_product = body.get("id_product")
+        id_account = body.get("id_account")
+        product = body.get("product")
+        list_product = [i.get("id_product") for i in product]
+        list_product.append(id_product)
+        check_exist = ProductModel().find({ProductModel.id: {"$in": list_product}})
+        if len(list_product) != len(check_exist):
+            return jsonify(self.get_error("ID product not exits")), 413
 
+        check_exits_account = AccountModel().filter_one({AccountField.id: id_account})
+        if not check_exits_account:
+            return jsonify(self.get_error("Account not exits")), 413
 
+        info_check_in = CheckInProduct().filter_one({CheckInProduct.id: id_order})
+        if not info_check_in:
+            return jsonify(self.get_error("Order not exist")), 413
+
+        get_price_by_product = {}
+        for i in check_exist:
+            product_id = i.get(ProductModel.id)
+            price = i.get(ProductModel.price)
+
+            get_price_by_product.update({product_id: price})
+
+        total_price = 0
+        for i in product:
+            id_product_order = i.get("id_product")
+            number = i.get("number")
+
+            price = get_price_by_product.get(id_product_order, 0)
+
+            price = price * number
+            total_price = total_price + price
+
+        price_room = get_price_by_product.get(id_product)
+        time_check_in = info_check_in.get(CheckInProduct.time_check_in)
+        tim_check_out = info_check_in.get(CheckInProduct.time_check_out)
+        time = Date.convert_str_to_date(time, "%d/%m/%Y")
+        time = Date.convert_date_to_timestamp(time)
+
+        if time > tim_check_out:
+            price_by_day = ((time - time_check_in) // 86400) * price_room
+        else:
+            price_by_day = ((tim_check_out - time_check_in) // 86400) * price_room
+        total_price = total_price + price_by_day
+        return {
+            "code": 200,
+            "total_price": total_price
+        }
 
     def list_order(self):
         params = request.args

@@ -22,7 +22,7 @@ def update_team(team_id):
     return TeamController().update_team(team_id)
 
 
-@team.route(TEAM.TEAM_UPDATE, methods=[METHOD.POST])
+@team.route(TEAM.TEAM_DELETE, methods=[METHOD.POST])
 #@cross_origin(origins="*")
 @token_required
 def delete_team():

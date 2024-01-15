@@ -52,6 +52,7 @@ class TEAM:
     TEAM = "/team"
     TEAM_UPDATE = "/team/<team_id>"
     TEAM_ACCOUNT = "/team/account"
+    TEAM_DELETE = "/team/delete"
 
 
 class METHOD:
@@ -68,6 +69,7 @@ class PRODUCT:
     PRE_ORDER = "/pre-order"
     CHECK_IN = "/check-in/<id_order>/room"
     CHECK_OUT = "/check-out/room"
+    GET_PRICE_CHECK_OUT = "/check_out/get-price"
     STATUS_ORDER = "/status-order"
     ORDER = "/order"
     PRODUCT_VILA = "/product/vila"
