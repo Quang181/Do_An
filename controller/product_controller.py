@@ -131,7 +131,15 @@ class ProductController(BaseController):
         param = request.args
         paging = self.generate_paging_from_args(param)
         sort_options = [(CategoryProductModel.update_on, DESCENDING)]
-        list_data = ProductModel().get_list_entity({ProductModel.name: "Vila"}, paging, {"_id": 0}, sort_options)
+        data = CategoryProductModel().filter_one({CategoryProductModel.name: "Vila"})
+        if not data:
+            return {
+                "code": 200,
+                "data": [],
+                "paging": paging
+            }
+        list_data = ProductModel().get_list_entity({ProductModel.id_category: data.get(CategoryProductModel.id)},
+                                                   paging, {"_id": 0}, sort_options)
         paginated = self.get_info_paging_for_response(list_data, paging)
         return {
             "code": 200,
@@ -339,9 +347,10 @@ class ProductController(BaseController):
             ids_product.append(i.get(CheckInProduct.id_product))
 
         if ids_product:
-            list_product = ProductModel().find({ProductModel.id: {"$in": ids_product}}, projection={"_id": 0, ProductModel.id_category: 1,
-                                                                                                    ProductModel.name: 1,
-                                                                                                    ProductModel.id: 1})
+            list_product = ProductModel().find({ProductModel.id: {"$in": ids_product}},
+                                               projection={"_id": 0, ProductModel.id_category: 1,
+                                                           ProductModel.name: 1,
+                                                           ProductModel.id: 1})
             ids_category = []
             for i in list_product:
                 convert_product.update({i.get(ProductModel.id): i})
@@ -351,7 +360,7 @@ class ProductController(BaseController):
                 list_category = CategoryProductModel().find({CategoryProductModel.id: {"$in": ids_category}},
                                                             projection={"_id": 0,
                                                                         CategoryProductModel.id: 1,
-                                                                        CategoryProductModel.name:1})
+                                                                        CategoryProductModel.name: 1})
                 for i in list_category:
                     convert_category.update({i.get(CategoryProductModel.id): i})
 
@@ -373,11 +382,11 @@ class ProductController(BaseController):
             info_account = data_account.get(id_account, {})
             order.update({"info_account": info_account})
             order.update({"info_product": convert_product.get(id_product, {})})
-            order.update({"info_category": convert_category.get(convert_product.get(id_product, {}).get(ProductModel.id_category))})
-
+            order.update({"info_category": convert_category.get(
+                convert_product.get(id_product, {}).get(ProductModel.id_category))})
 
         return {
-             "code": 200,
+            "code": 200,
             "data": list_check_in.get("list_data"),
             "paging": paginated
         }
