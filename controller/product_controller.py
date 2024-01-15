@@ -330,6 +330,8 @@ class ProductController(BaseController):
         if start and end:
             start = Date.convert_str_to_date(start, "%d/%m/%Y")
             end = Date.convert_str_to_date(end, "%d/%m/%Y")
+            start = Date.convert_date_to_timestamp(start)
+            end = Date.convert_date_to_timestamp(end)
 
             data_query.update({
                 CheckInProduct.time_check_in: {"$gte": start},
