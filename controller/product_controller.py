@@ -295,7 +295,7 @@ class ProductController(BaseController):
             "data": data_return
         }
 
-    # def check_out(self):
+    # def get_price_check_out(self, id_order):
     #     body = request.json
     #     time = body.get("time")
     #     id_product = body.get("id_product")
@@ -311,7 +311,18 @@ class ProductController(BaseController):
     #     if not check_exits_account:
     #         return jsonify(self.get_error("Account not exits")), 413
     #
-    #     info_check_in = CheckInProduct().filter_one({CheckInProduct.id: ch})
+    #     info_check_in = CheckInProduct().filter_one({CheckInProduct.id: id_order})
+    #     if not info_check_in:
+    #         return jsonify(self.get_error("Order not exist")), 413
+    #
+    #     get_price_by_product = {}
+    #     for i in check_exist:
+    #         product_id = i.get(ProductModel.id)
+    #         price = i.get(ProductModel.price)
+    #
+    #         get_price_by_product.update({product_id: price})
+
+
 
     def list_order(self):
         params = request.args
@@ -382,7 +393,11 @@ class ProductController(BaseController):
             id_product = order.get(CheckInProduct.id_product)
             id_account = order.get(CheckInProduct.id_account)
             info_account = data_account.get(id_account, {})
-            order.update({"info_account": info_account})
+            check_in = datetime.datetime.fromtimestamp(order.get(CheckInProduct.time_check_in))
+            check_out = datetime.datetime.fromtimestamp(order.get(CheckInProduct.time_check_out))
+            order.update({"info_account": info_account,
+                          CheckInProduct.time_check_in: check_in,
+                          CheckInProduct.time_check_out: check_out})
             order.update({"info_product": convert_product.get(id_product, {})})
             order.update({"info_category": convert_category.get(
                 convert_product.get(id_product, {}).get(ProductModel.id_category))})
