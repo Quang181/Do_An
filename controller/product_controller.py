@@ -332,7 +332,7 @@ class ProductController(BaseController):
             id_product_order = i.get("id_product")
             number = i.get("number")
 
-            price = get_price_by_product.get(id_product_order, 0)
+            price = int(get_price_by_product.get(id_product_order, 0))
 
             price = price * number
             total_price = total_price + price
