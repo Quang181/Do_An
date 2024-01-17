@@ -40,6 +40,7 @@ class ACCOUNT:
     CHECK_DAY_CHECK_In = "/day/status-check-in"
     ACCOUNT_CHECK_IN_DAY = "/account/day/check-in"
     ACCOUNT_NOT_CLIENT = "/account/not-client"
+    INFO_ACCOUNT = "/account/info"
 
 
 class CATEGORY:
@@ -68,8 +69,8 @@ class PRODUCT:
     PRODUCT_UPDATE = "/product/<id_product>"
     PRE_ORDER = "/pre-order"
     CHECK_IN = "/check-in/<id_order>/room"
-    CHECK_OUT = "/check-out/room"
-    GET_PRICE_CHECK_OUT = "/check_out/get-price"
+    CHECK_OUT = "/check-out/<id_order>/room"
+    GET_PRICE_CHECK_OUT = "/check-out/get-price"
     STATUS_ORDER = "/status-order"
     ORDER = "/order"
     PRODUCT_VILA = "/product/vila"

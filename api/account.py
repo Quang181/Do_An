@@ -115,3 +115,9 @@ def list_account_check_in_by_day():
 @token_required
 def list_account_not_client():
     return AccountController().list_account_not_client()
+
+
+@account.route(ACCOUNT.INFO_ACCOUNT, methods={METHOD.GET})
+@token_required
+def info_account():
+    return AccountController().info_account()

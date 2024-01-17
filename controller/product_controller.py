@@ -269,6 +269,7 @@ class ProductController(BaseController):
             CheckInProduct.time_check_in: start,
             CheckInProduct.time_check_out: end,
             CheckInProduct.id_account: id_account,
+            "total_price": 0,
             **self.this_moment_create()
         }
         data_return = copy.deepcopy(data_iinsert)
@@ -295,14 +296,18 @@ class ProductController(BaseController):
             "data": data_return
         }
 
-    def get_price_check_out(self, id_order):
+    def get_price_check_out(self):
         body = request.json
         time = body.get("time")
         id_product = body.get("id_product")
         id_account = body.get("id_account")
-        product = body.get("product")
+        id_order = body.get("id_order")
+        product = body.get("product", [])
         list_product = [i.get("id_product") for i in product]
         list_product.append(id_product)
+        if not id_order:
+            return jsonify(self.get_error("id_order not null")), 413
+
         check_exist = ProductModel().find({ProductModel.id: {"$in": list_product}})
         if len(list_product) != len(check_exist):
             return jsonify(self.get_error("ID product not exits")), 413
@@ -451,3 +456,22 @@ class ProductController(BaseController):
             "code": 200,
             "data": list_return
         }
+
+    def check_out(self, id_order):
+        body = request.json
+        total_price = body.get("total_price")
+        if not total_price:
+            return jsonify(self.get_error("Total price not null")), 413
+        if not CheckInProduct().filter_one({CheckInProduct.id: id_order}):
+            return jsonify(self.get_error("Hoa don khong ton tai")), 413
+
+        update_order = CheckInProduct().update_one({CheckInProduct.id: id_order},
+                                                   {"total_price": total_price,
+                                                    "status": CheckInProduct.Status.check_out})
+
+        return {
+            "code": 200,
+        }
+
+
+

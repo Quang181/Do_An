@@ -1,6 +1,9 @@
 import math
 
 import pymongo
+import os
+
+from common.field_common import PAGINATION
 
 from common.field_common import PAGINATION
 
@@ -11,6 +14,15 @@ Mongo_Client = pymongo.MongoClient(MONGO_URI)
 
 CONFIG_ACCOUNT_DB = Mongo_Client[MONGO_DB]
 
+# DB Local
+# MONGO_USERNAME = os.environ.get("MONGO_USERNAME")
+# MONGO_PASSWORD = os.environ.get("MONGO_PASSWORD")
+# MONGO_DB = os.environ.get("MONGO_DB")
+#
+# Mongo_Client = pymongo.MongoClient(
+#     host="localhost", port=27017, username=MONGO_USERNAME, password=MONGO_PASSWORD)
+#
+# CONFIG_ACCOUNT_DB = Mongo_Client[MONGO_DB]
 
 class BaseMongo:
     def __init__(self, col=None) -> None:
@@ -107,3 +119,47 @@ class BaseMongo:
 
 if __name__ == "__main__":
     c = BaseMongo().test()
+
+  # {
+  #       "code": 200,
+  #       "data": [
+  #           {
+  #               "email": "email@gmail.com",
+  #               "fullname": "fullname",
+  #               "id": "15989b94-a1a4-11ee-9325-6f547aaa83ce",
+  #               "phone": "0987654321",
+  #               "role": "user",
+  #               "username": "test5"
+  #           },
+  #           {
+  #               "email": "email@gmail.com",
+  #               "fullname": "fullname",
+  #               "id": "12fe9208-a1a4-11ee-9325-6f547aaa83ce",
+  #               "phone": "0987654321",
+  #               "role": "user",
+  #               "username": "test4"
+  #           },
+  #           {
+  #               "email": "email@gmail.com",
+  #               "fullname": "fullname",
+  #               "id": "106771d6-a1a4-11ee-9325-6f547aaa83ce",
+  #               "phone": "0987654321",
+  #               "role": "user",
+  #               "username": "test3"
+  #           },
+  #           {
+  #               "email": "email@gmail.com",
+  #               "fullname": "fullname",
+  #               "id": "0a9d9942-a1a4-11ee-9325-6f547aaa83ce",
+  #               "phone": "0987654321",
+  #               "role": "user",
+  #               "username": "test2"
+  #           }
+  #       ],
+  #       "paging": {
+  #           "page": 1,
+  #           "per_page": 15,
+  #           "total_count": 4,
+  #           "total_page": 1
+  #       }
+  #   }

@@ -49,8 +49,8 @@ def check_in(id_product):
 
 @product.route(PRODUCT.GET_PRICE_CHECK_OUT, methods=[METHOD.POST])
 @token_required
-def get_price_check_out(order_id):
-    return ProductController().get_price_check_out(order_id)
+def get_price_check_out():
+    return ProductController().get_price_check_out()
 
 
 @product.route(PRODUCT.STATUS_ORDER, methods=[METHOD.GET])
@@ -75,3 +75,9 @@ def get_list_vila():
 @token_required
 def get_list_product_not_vila():
     return ProductController().get_list_product_not_vila()
+
+
+@product.route(PRODUCT.CHECK_OUT, methods=[METHOD.PATCH])
+@token_required
+def check_out(id_order):
+    return ProductController().check_out(id_order)
