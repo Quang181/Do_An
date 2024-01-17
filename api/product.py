@@ -38,8 +38,8 @@ def pre_order():
 
 @product.route(PRODUCT.CHECK_IN, methods=[METHOD.PATCH])
 @token_required
-def check_in(id_product):
-    return ProductController().check_in(id_product)
+def check_in_room(id_order):
+    return ProductController().check_in(id_order)
 
 
 # @product.route(PRODUCT.CHECK_OUT, methods=[METHOD.POST])

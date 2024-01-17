@@ -474,6 +474,3 @@ class ProductController(BaseController):
         return {
             "code": 200,
         }
-
-
-
