@@ -344,9 +344,11 @@ class ProductController(BaseController):
         time = Date.convert_date_to_timestamp(time)
 
         if time > tim_check_out:
-            price_by_day = ((time - time_check_in) // 86400) * price_room
+            price_by_day = (time - time_check_in) // 86400
+            price_by_day = price_by_day * int(price_room)
         else:
-            price_by_day = ((tim_check_out - time_check_in) // 86400) * price_room
+            price_by_day = (tim_check_out - time_check_in) // 86400
+            price_by_day = price_by_day * int(price_room)
         total_price = total_price + price_by_day
         return {
             "code": 200,

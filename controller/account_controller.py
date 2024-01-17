@@ -671,3 +671,23 @@ class AccountController(BaseController):
             "code": 200,
             "data": list_account
         }
+
+    def info_account(self):
+        id_account = self.get_info_in_token(AccountField.id)
+        info_account = AccountModel().filter_one({AccountField.id: id_account})
+        if not info_account:
+            return jsonify(self.get_error("Account id not eixts")), 413
+
+        data_return = {
+            AccountField.id: info_account.get(AccountField.id),
+            AccountField.username: info_account.get(AccountField.id),
+            AccountField.fullname: info_account.get(AccountField.fullname),
+            AccountField.phone: info_account.get(AccountField.phone),
+            AccountField.email: info_account.get(AccountField.email),
+            AccountField.role: info_account.get(AccountField.role)
+        }
+
+        return {
+            "code": 200,
+            "data": data_return
+        }
