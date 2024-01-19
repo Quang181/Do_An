@@ -32,12 +32,12 @@ def status_work():
 @work.route(WORK.WORK_USER, methods=[METHOD.GET])
 # @cross_origin(origins="*")
 @token_required
-def status_work():
+def get_work_user():
     return WorkController().get_work_user()
 
 
 @work.route(WORK.WORK_UPDATE, methods=[METHOD.PATCH])
 # @cross_origin(origins="*")
 @token_required
-def status_work(id_work):
+def update_done_work(id_work):
     return WorkController().update_done_work(id_work)
