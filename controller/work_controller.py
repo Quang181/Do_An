@@ -121,7 +121,7 @@ class WorkController(BaseController):
 
     def update_done_work(self, id_work):
         id_account = self.get_info_in_token("id")
-        check_exits = WorkModel().filter_one({WorkModel.id: id_work}, projection={"_id"})
+        check_exits = WorkModel().filter_one({WorkModel.id: id_work}, projection={"_id": 0})
         data_return = copy.deepcopy(check_exits)
         if not check_exits:
             return jsonify(self.get_error("Work not exist")), 413
