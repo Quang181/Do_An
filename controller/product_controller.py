@@ -151,7 +151,15 @@ class ProductController(BaseController):
         param = request.args
         paging = self.generate_paging_from_args(param)
         sort_options = [(CategoryProductModel.update_on, DESCENDING)]
-        list_data = ProductModel().get_list_entity({ProductModel.name: {"$nin": ["Vila"]}}, paging, {"_id": 0},
+        list_category = CategoryProductModel().find({CategoryProductModel.name: {"$nin": ["Vila"]}})
+        id_category = [i.get(CategoryProductModel.id) for i in list_category]
+        if not id_category:
+            return {
+                "code": 200,
+                "data": [],
+                "paging": paging
+            }
+        list_data = ProductModel().get_list_entity({ProductModel.id_category: {"$in": id_category}}, paging, {"_id": 0},
                                                    sort_options)
         paginated = self.get_info_paging_for_response(list_data, paging)
         return {

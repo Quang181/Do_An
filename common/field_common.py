@@ -75,3 +75,8 @@ class PRODUCT:
     ORDER = "/order"
     PRODUCT_VILA = "/product/vila"
     PRODUCT_NOT_VILA = "/product/not-vila"
+
+
+class WAGE:
+    WAGE = "/wage"
+    WAGE_UPDATE = "/wage/<account_id>"

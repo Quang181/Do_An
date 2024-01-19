@@ -39,7 +39,7 @@ def forget_password():
     return AccountController().forget_password()
 
 
-@account.route(ACCOUNT.CHANGE_PASSWORD, methods={METHOD.POST})
+@account.route(ACCOUNT.CHANGE_PASSWORD, methods={METHOD.PUT})
 #@cross_origin(origins="*")
 def change_password():
     return AccountController().check_random_str()
