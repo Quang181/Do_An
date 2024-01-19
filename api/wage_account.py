@@ -5,7 +5,7 @@ from controller.wage_account_controller import WageAccountController
 from auth.auth import token_required
 from common.field_common import TEAM, METHOD, ACCOUNT, WAGE
 
-wage = Blueprint("team", __name__)
+wage = Blueprint("wage", __name__)
 
 
 @wage.route(WAGE.WAGE, methods=[METHOD.POST])

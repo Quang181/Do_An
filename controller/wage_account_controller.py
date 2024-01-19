@@ -55,7 +55,7 @@ class WageAccountController(BaseController):
         paging = self.generate_paging_from_args(param)
         list_data_wage = WageAccountModel().get_list_entity({}, paging)
 
-        paginated = self.get_info_paging_for_response(list_data_wage.get("list_data"), paging)
+        paginated = self.get_info_paging_for_response(list_data_wage, paging)
         account_ids = [i.get(WageAccountModel.account_id) for i in list_data_wage.get("list_data")]
 
         data_convert = {}
