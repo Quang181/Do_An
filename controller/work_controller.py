@@ -51,11 +51,11 @@ class WorkController(BaseController):
         ids_product = [i.get(WorkModel.product_id) for i in list_data.get("list_data")]
 
         list_account = AccountModel().find({AccountField.id: {"$in": ids_account}}, projection={"_id": 0})
-        if not list_account:
-            return jsonify(self.get_error("Account not exits")), 413
+        # if not list_account:
+        #     return jsonify(self.get_error("Account not exits")), 413
         list_product = ProductModel().find({ProductModel.id: {"$in": ids_product}}, projection={"_id": 0})
-        if not list_product:
-            return jsonify(self.get_error("Product not exits")), 413
+        # if not list_product:
+        #     return jsonify(self.get_error("Product not exits")), 413
 
         convert_account = {}
         convert_product = {}
@@ -91,11 +91,11 @@ class WorkController(BaseController):
         ids_account = [i.get(WorkModel.account_id) for i in list_data.get("list_data")]
         ids_product = [i.get(WorkModel.product_id) for i in list_data.get("list_data")]
         list_account = AccountModel().find({AccountField.id: {"$in": ids_account}}, projection={"_id": 0})
-        if not list_account:
-            return jsonify(self.get_error("Account not exits")), 413
+        # if not list_account:
+        #     return jsonify(self.get_error("Account not exits")), 413
         list_product = ProductModel().find({ProductModel.id: {"$in": ids_product}}, projection={"_id": 0})
-        if not list_product:
-            return jsonify(self.get_error("Product not exits")), 413
+        # if not list_product:
+        #     return jsonify(self.get_error("Product not exits")), 413
 
         convert_account = {}
         convert_product = {}
