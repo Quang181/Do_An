@@ -10,6 +10,9 @@ class WageAccountController(BaseController):
         body = request.json
         account_id = body.get("account_id")
         wage = body.get("wage")
+        check_exits = AccountModel().filter_one({AccountField.id: account_id}, projection={"_id": 0})
+        if not check_exits:
+            return jsonify(self.get_error("Account not exits")), 413
 
         if WageAccountModel().filter_one({WageAccountModel.account_id: account_id}):
             return jsonify(self.get_error("Nhân viên đã có mức lương từ trước đó")), 413
@@ -18,6 +21,7 @@ class WageAccountController(BaseController):
             WageAccountModel.wage: wage,
             **self.this_moment_create()})
 
+        body.update({**check_exits})
         if insert_data:
             return {
                 "code": 200,
@@ -53,7 +57,7 @@ class WageAccountController(BaseController):
     def get_data_wage(self):
         param = request.args
         paging = self.generate_paging_from_args(param)
-        list_data_wage = WageAccountModel().get_list_entity({}, paging)
+        list_data_wage = WageAccountModel().get_list_entity({}, paging, projection={"_id": 0})
 
         paginated = self.get_info_paging_for_response(list_data_wage, paging)
         account_ids = [i.get(WageAccountModel.account_id) for i in list_data_wage.get("list_data")]
@@ -83,4 +87,3 @@ class WageAccountController(BaseController):
             "data": list_data_wage.get("list_data"),
             "paging": paginated
         }
-
