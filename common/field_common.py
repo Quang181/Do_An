@@ -80,3 +80,10 @@ class PRODUCT:
 class WAGE:
     WAGE = "/wage"
     WAGE_UPDATE = "/wage/<account_id>"
+
+
+class WORK:
+    WORK = "/work"
+    WORK_UPDATE = "/work/<id_work>"
+    WORK_USER = "/work-user"
+    WORK_STAUT = "/work-status"
